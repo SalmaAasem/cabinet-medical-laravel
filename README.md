@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #  Cabinet Médical - Application de Gestion
 
 Application web pour la gestion d'un cabinet médical (prise de rendez-vous, consultations, ordonnances PDF).
@@ -38,3 +39,6 @@ Application web pour la gestion d'un cabinet médical (prise de rendez-vous, con
 ```bash
 git clone https://github.com/votre-compte/cabinet-medical.git
 cd cabinet-medical
+=======
+# cabinet-medical-laravel
+>>>>>>> 179726bd0b085baf88b9fd7ffc3d0981056cf7fd
