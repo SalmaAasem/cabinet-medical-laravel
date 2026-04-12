@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #  Cabinet Médical - Application de Gestion
 
 Application web pour la gestion d'un cabinet médical (prise de rendez-vous, consultations, ordonnances PDF).
@@ -9,7 +8,7 @@ Application web pour la gestion d'un cabinet médical (prise de rendez-vous, con
 -  Gestion des rôles (Patient, Médecin, Secrétaire, Admin)
 -  Prise de rendez-vous en ligne
 -  Consultation médicale (diagnostic, traitement)
--  Génération d'ordonnances en PDF
+- Génération d'ordonnances en PDF
 -  Gestion des utilisateurs (Admin)
 -  Tableau de bord avec graphiques
 -  Notifications par email
@@ -37,8 +36,5 @@ Application web pour la gestion d'un cabinet médical (prise de rendez-vous, con
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/votre-compte/cabinet-medical.git
+git clone https://github.com/SalmaAasem/cabinet-medical-laravel
 cd cabinet-medical
-=======
-# cabinet-medical-laravel
->>>>>>> 179726bd0b085baf88b9fd7ffc3d0981056cf7fd
