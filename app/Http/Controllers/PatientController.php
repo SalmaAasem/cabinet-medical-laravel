@@ -51,4 +51,16 @@ class PatientController extends Controller
         
         return redirect()->route('patients.create')->with('success', 'Patient ajouté avec succès !');
     }
+    // Mise à jour du dossier 
+    public function update(Request $request, Patient $patient)
+    {
+        $request->validate([
+            'telephone' => 'required|string',
+            'adresse' => 'required|string',
+        ]);
+
+        $patient->update($request->only(['telephone', 'adresse', 'date_naissance']));
+
+        return redirect()->back()->with('success', 'Le dossier médical a été mis à jour avec succès.');
+    }
 }

@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AppointmentConfirmation; 
 
 class RendezVousController extends Controller
 {
@@ -60,6 +62,8 @@ class RendezVousController extends Controller
             'statut' => 'en_attente',
         ]);
 
+        Mail::to($request->patient_email)->send(new AppointmentConfirmation($request->all()));
+        
         return redirect()->route('dashboard')->with('success', 'Rendez-vous réservé avec succès ! Un compte patient a été créé.');
     }
 public function destroy($id)
