@@ -5,16 +5,16 @@ Application web pour la gestion d'un cabinet médical (prise de rendez-vous, con
 
 ##  Fonctionnalités
 
-- ✅ Authentification (inscription, connexion, déconnexion)
-- ✅ Gestion des rôles (Patient, Médecin, Secrétaire, Admin)
-- ✅ Prise de rendez-vous en ligne
-- ✅ Consultation médicale (diagnostic, traitement)
-- ✅ Génération d'ordonnances en PDF
-- ✅ Gestion des utilisateurs (Admin)
-- ✅ Tableau de bord avec graphiques
-- ✅ Notifications par email
+-  Authentification (inscription, connexion, déconnexion)
+-  Gestion des rôles (Patient, Médecin, Secrétaire, Admin)
+-  Prise de rendez-vous en ligne
+-  Consultation médicale (diagnostic, traitement)
+-  Génération d'ordonnances en PDF
+-  Gestion des utilisateurs (Admin)
+-  Tableau de bord avec graphiques
+-  Notifications par email
 
-## 🛠 Technologies utilisées
+##  Technologies utilisées
 
 | Technologie | Version |
 |-------------|---------|
