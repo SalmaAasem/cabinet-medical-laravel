@@ -102,14 +102,9 @@
                                 <td>{{ $patient->telephone }}</td>
                                 <td>{{ $patient->date_naissance }}</td>
                                 <td>{{ $patient->adresse }}</td>
-                                <td>
-                                    <a href="{{ route('patients.edit', $patient->id) }}" class="btn btn-sm btn-warning rounded-3">
-                                        <i class="fas fa-edit"></i> Modifier
-                                    </a>
-                                    <a href="{{ route('patients.historique', $patient->id) }}" class="btn btn-sm btn-info rounded-3">
-                                        <i class="fas fa-history"></i> Historique
-                                    </a>
-                                 </td>
+                               <td>
+    <span class="text-muted">-</span>
+</td>
                             </tr>
                             @endforeach
                         </tbody>

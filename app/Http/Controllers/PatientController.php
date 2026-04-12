@@ -51,4 +51,20 @@ class PatientController extends Controller
         
         return redirect()->route('patients.create')->with('success', 'Patient ajouté avec succès !');
     }
+
+    // Rechercher un patient
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+        
+        $patients = Patient::with('user')
+            ->whereHas('user', function($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('email', 'like', '%' . $search . '%');
+            })
+            ->orWhere('telephone', 'like', '%' . $search . '%')
+            ->get();
+        
+        return view('patients.index', compact('patients', 'search'));
+    }
 }
