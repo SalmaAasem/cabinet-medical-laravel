@@ -12,4 +12,9 @@ class Consultation extends Model
     {
         return $this->belongsTo(RendezVous::class);
     }
+
+    public function medecin()
+    {
+        return $this->belongsTo(User::class, 'user_id'); 
+    }
 }

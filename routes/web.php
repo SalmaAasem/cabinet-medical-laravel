@@ -51,6 +51,9 @@ Route::get('/admin/users', function () {
     }
 })->name('admin.users');
 
+// Route pour afficher l'historique d'un patient
+Route::get('/patients/{id}/historique', [PatientController::class, 'showHistorique'])->name('patients.historique');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/prendre-rendez-vous', [RendezVousController::class, 'create'])->name('rendez-vous.create');
     Route::post('/rendez-vous', [RendezVousController::class, 'store'])->name('rendez-vous.store');

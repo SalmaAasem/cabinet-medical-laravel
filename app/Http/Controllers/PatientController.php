@@ -63,4 +63,15 @@ class PatientController extends Controller
 
         return redirect()->back()->with('success', 'Le dossier médical a été mis à jour avec succès.');
     }
+
+    public function showHistorique($id)
+    {
+        // Récupérer le patient avec toutes ses consultations (Eloquent ORM)
+        $patient = Patient::with(['consultations.medecin'])->findOrFail($id);
+
+        // Vérification simple des rôles (pour la logique d'affichage)
+        $user = Auth::user();
+    
+        return view('patients.historique', compact('patient', 'user'));
+    }
 }
