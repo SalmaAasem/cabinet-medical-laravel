@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Patient;
+use App\Models\Medecin;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,10 +32,13 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // DEBUG: Affiche toutes les données envoyées
+        // dd($request->all()); // Décommente pour déboguer
+        
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-           'role' => ['required', 'in:patient,medecin,secretaire'],
+            'role' => ['required', 'in:patient,medecin,secretaire,admin'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -45,13 +49,23 @@ class RegisteredUserController extends Controller
             'role' => $request->role,
         ]);
 
-        // Création automatique du dossier patient si le rôle est "patient"
+        // Création automatique du dossier patient
         if ($request->role == 'patient') {
             Patient::create([
                 'user_id' => $user->id,
                 'date_naissance' => null,
                 'telephone' => null,
                 'adresse' => null,
+            ]);
+        }
+
+        // Création automatique du dossier médecin
+        if ($request->role == 'medecin') {
+            Medecin::create([
+                'user_id' => $user->id,
+                'specialite' => null,
+                'diplome' => null,
+                'annee_experience' => null,
             ]);
         }
 

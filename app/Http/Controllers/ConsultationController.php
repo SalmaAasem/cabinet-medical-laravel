@@ -10,16 +10,20 @@ use Illuminate\Support\Facades\Auth;
 class ConsultationController extends Controller
 {
     public function index()
-    {
-        $medecin = Auth::user()->medecin;
-        $rendezVous = RendezVous::where('medecin_id', $medecin->id)
-            ->with('patient.user', 'consultation')
-            ->orderBy('date_heure', 'asc')
-            ->get();
-        
-        return view('medecin.rendez-vous', compact('rendezVous'));
+{
+    $medecin = Auth::user()->medecin;
+    
+    if (!$medecin) {
+        return redirect()->route('dashboard')->with('error', 'Vous n\'avez pas de dossier médecin. Contactez l\'administrateur.');
     }
     
+    $rendezVous = RendezVous::where('medecin_id', $medecin->id)
+        ->with('patient.user', 'consultation')
+        ->orderBy('date_heure', 'asc')
+        ->get();
+    
+    return view('medecin.rendez-vous', compact('rendezVous'));
+}
     public function create($id)
     {
         $rendezVous = RendezVous::with('patient.user')->findOrFail($id);

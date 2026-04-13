@@ -64,26 +64,38 @@
                         <p>Inscrivez-vous pour accéder à nos services</p>
                     </div>
                     <div class="register-body">
+                        
+                        <!-- Affichage des erreurs -->
+                        @if($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <form method="POST" action="{{ route('register') }}" autocomplete="off">
                             @csrf
 
                             <div class="mb-3">
                                 <label class="form-label">Nom complet</label>
-                                <input type="text" name="name" class="form-control" required autocomplete="off">
+                                <input type="text" name="name" class="form-control" value="{{ old('name') }}" required autocomplete="off">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Adresse email</label>
-                                <input type="email" name="email" class="form-control" required autocomplete="off">
+                                <input type="email" name="email" class="form-control" value="{{ old('email') }}" required autocomplete="off">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Rôle</label>
                                 <select name="role" class="form-select" required>
-                                    <option value="patient">Patient</option>
-                                    <option value="medecin">Médecin</option>
-                                    <option value="secretaire">Secrétaire</option>
-                                    <option value="admin">Administrateur</option>
+                                    <option value="patient" {{ old('role') == 'patient' ? 'selected' : '' }}>Patient</option>
+                                    <option value="medecin" {{ old('role') == 'medecin' ? 'selected' : '' }}>Médecin</option>
+                                    <option value="secretaire" {{ old('role') == 'secretaire' ? 'selected' : '' }}>Secrétaire</option>
+                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrateur</option>
                                 </select>
                             </div>
 
