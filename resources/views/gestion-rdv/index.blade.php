@@ -26,6 +26,36 @@
         </div>
     </div>
 
+    <!-- Barre de recherche -->
+    <div class="card shadow-lg border-0 rounded-4 mb-4">
+        <div class="card-body p-4">
+            <form method="GET" action="{{ route('gestion-rdv.search') }}" class="row g-3">
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text" name="search" class="form-control form-control-lg" 
+                               placeholder="Rechercher par patient, médecin ou date..." 
+                               value="{{ $search ?? '' }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-lg w-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                        <i class="fas fa-search me-2"></i> Chercher
+                    </button>
+                </div>
+            </form>
+            @if(isset($search))
+                <div class="mt-2">
+                    <a href="{{ route('gestion-rdv.index') }}" class="text-muted">
+                        <i class="fas fa-times me-1"></i> Effacer la recherche
+                    </a>
+                </div>
+            @endif
+        </div>
+    </div>
+
     <!-- Stats Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-3">
@@ -92,7 +122,7 @@
             @if($rendezVous->isEmpty())
                 <div class="text-center text-muted py-5">
                     <i class="fas fa-calendar-times fa-4x mb-3 opacity-25"></i>
-                    <p class="mb-0">Aucun rendez-vous pour le moment.</p>
+                    <p class="mb-0">Aucun rendez-vous trouvé.</p>
                 </div>
             @else
                 <div class="table-responsive">

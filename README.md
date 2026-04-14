@@ -1,44 +1,53 @@
-<<<<<<< HEAD
-#  Cabinet Médical - Application de Gestion
+ *************************Guide d'installation détaillé - Cabinet Médical***************************
 
-Application web pour la gestion d'un cabinet médical (prise de rendez-vous, consultations, ordonnances PDF).
+Ce document explique étape par étape comment installer et configurer l'application **Cabinet Médical** sur votre machine.
 
-##  Fonctionnalités
-
--  Authentification (inscription, connexion, déconnexion)
--  Gestion des rôles (Patient, Médecin, Secrétaire, Admin)
--  Prise de rendez-vous en ligne
--  Consultation médicale (diagnostic, traitement)
--  Génération d'ordonnances en PDF
--  Gestion des utilisateurs (Admin)
--  Tableau de bord avec graphiques
--  Notifications par email
-
-##  Technologies utilisées
-
-| Technologie | Version |
-|-------------|---------|
-| Laravel | 11.x |
-| PHP | 8.2 |
-| MySQL | 8.0 |
-| Bootstrap | 5.3 |
-| DomPDF | 3.x |
-| Chart.js | 4.x |
+---
 
 ##  Prérequis
 
-- PHP >= 8.2
-- Composer
-- MySQL
-- Node.js (pour les assets)
+Avant de commencer, assurez-vous d'avoir installé :
 
-##  Installation
+| Logiciel | Version minimale | Lien de téléchargement |
+|----------|------------------|------------------------|
+| PHP | 8.1 ou 8.2 | https://www.php.net/downloads |
+| Composer | 2.x | https://getcomposer.org/download/ |
+| MySQL | 8.0 | https://dev.mysql.com/downloads/ |
+| Node.js | 18.x | https://nodejs.org/ |
+| XAMPP/WAMP | (pour Windows) | https://www.apachefriends.org/ |
 
-### 1. Cloner le projet
+---
+
+##  Installation étape par étape
+
+### 1. Installer XAMPP (Windows)
+
+1. Téléchargez XAMPP depuis https://www.apachefriends.org/
+2. Lancez l'installateur
+3. Cliquez **"Suivant"** jusqu'à la fin
+4. Lancez **XAMPP Control Panel**
+5. Démarrez **Apache** et **MySQL** (bouton Start)
+
+### 2. Installer Composer
+
+1. Téléchargez Composer depuis https://getcomposer.org/download/
+2. Lancez l'installateur
+3. Sélectionnez `C:\xampp\php\php.exe` comme chemin PHP
+4. Terminez l'installation
+
+### 3. Installer Node.js$user = User::create
+
+1. Téléchargez Node.js depuis https://nodejs.org/
+2. Choisissez la version **LTS**
+3. Lancez l'installateur (tout accepter par défaut)
+4. Redémarrez votre ordinateur
+
+---
+
+##  Récupérer le projet
+
+### Option 1 : Cloner depuis GitHub
 
 ```bash
-git clone https://github.com/votre-compte/cabinet-medical.git
+git clone git clone https://github.com/SalmaAasem/cabinet-medical-laravel
 cd cabinet-medical
-=======
-# cabinet-medical-laravel
->>>>>>> 179726bd0b085baf88b9fd7ffc3d0981056cf7fd

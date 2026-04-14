@@ -63,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/medecin/rendez-vous', [App\Http\Controllers\ConsultationController::class, 'index'])->name('medecin.rendez-vous');
     Route::get('/medecin/consultation/{id}', [App\Http\Controllers\ConsultationController::class, 'create'])->name('medecin.consultation.create');
     Route::post('/medecin/consultation', [App\Http\Controllers\ConsultationController::class, 'store'])->name('medecin.consultation.store');
+Route::get('/medecin/patients', [App\Http\Controllers\ConsultationController::class, 'patients'])->name('medecin.patients');
 });
 
 // Routes pour la gestion des patients
@@ -78,7 +79,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/gestion-rdv', [App\Http\Controllers\GestionRdvController::class, 'index'])->name('gestion-rdv.index');
     Route::put('/gestion-rdv/{id}', [App\Http\Controllers\GestionRdvController::class, 'update'])->name('gestion-rdv.update');
     Route::delete('/gestion-rdv/{id}', [App\Http\Controllers\GestionRdvController::class, 'destroy'])->name('gestion-rdv.destroy');
+Route::get('/gestion-rdv/search', [App\Http\Controllers\GestionRdvController::class, 'search'])->name('gestion-rdv.search');
 });
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
