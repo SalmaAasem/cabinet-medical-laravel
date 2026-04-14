@@ -33,7 +33,6 @@ class PatientController extends Controller
             'adresse' => 'required|string',
         ]);
         
-        // Créer l'utilisateur
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -41,7 +40,6 @@ class PatientController extends Controller
             'role' => 'patient',
         ]);
         
-        // Créer le dossier patient
         Patient::create([
             'user_id' => $user->id,
             'date_naissance' => $request->date_naissance,
@@ -49,9 +47,9 @@ class PatientController extends Controller
             'adresse' => $request->adresse,
         ]);
         
-        return redirect()->route('patients.create')->with('success', 'Patient ajouté avec succès !');
+        return redirect()->route('patients.index')->with('success', 'Patient ajouté avec succès !');
     }
-
+    
     // Rechercher un patient
     public function search(Request $request)
     {
@@ -66,5 +64,51 @@ class PatientController extends Controller
             ->get();
         
         return view('patients.index', compact('patients', 'search'));
+    }
+    
+    // Afficher le formulaire de modification
+    public function edit($id)
+    {
+        $patient = Patient::with('user')->findOrFail($id);
+        return view('patients.edit', compact('patient'));
+    }
+    
+    // Mettre à jour un patient
+    public function update(Request $request, $id)
+    {
+        $patient = Patient::findOrFail($id);
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $patient->user_id,
+            'telephone' => 'required|string',
+            'date_naissance' => 'required|date',
+            'adresse' => 'required|string',
+        ]);
+        
+        $user = User::find($patient->user_id);
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+        
+        $patient->update([
+            'date_naissance' => $request->date_naissance,
+            'telephone' => $request->telephone,
+            'adresse' => $request->adresse,
+        ]);
+        
+        return redirect()->route('patients.index')->with('success', 'Patient modifié avec succès !');
+    }
+    
+    // Supprimer un patient
+    public function destroy($id)
+    {
+        $patient = Patient::findOrFail($id);
+        $user = User::find($patient->user_id);
+        $user->delete();
+        $patient->delete();
+        
+        return redirect()->route('patients.index')->with('success', 'Patient supprimé avec succès !');
     }
 }

@@ -17,62 +17,84 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
     public function create(): View
     {
         return view('auth.register');
     }
 
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws ValidationException
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        // DEBUG: Affiche toutes les données envoyées
-        // dd($request->all()); // Décommente pour déboguer
-        
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'role' => ['required', 'in:patient,medecin,secretaire,admin'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
-
-        // Création automatique du dossier patient
-        if ($request->role == 'patient') {
-            Patient::create([
-                'user_id' => $user->id,
-                'date_naissance' => null,
-                'telephone' => null,
-                'adresse' => null,
-            ]);
-        }
-
-        // Création automatique du dossier médecin
-        if ($request->role == 'medecin') {
-            Medecin::create([
-                'user_id' => $user->id,
-                'specialite' => null,
-                'diplome' => null,
-                'annee_experience' => null,
-            ]);
-        }
-
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
+   public function store(Request $request): RedirectResponse
+{
+   
+    
+    // Validation de base
+    $validator = validator($request->all(), [
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+        'role' => ['required', 'in:patient,medecin,secretaire,admin'],
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+    ]);
+    
+    if ($validator->fails()) {
+        return back()->withErrors($validator)->withInput();
     }
+
+    // Validation pour le rôle PATIENT
+    if ($request->role == 'patient') {
+        $validatorPatient = validator($request->all(), [
+            'telephone' => ['required', 'string'],
+            'date_naissance' => ['required', 'date'],
+            'adresse' => ['required', 'string'],
+        ]);
+        
+        if ($validatorPatient->fails()) {
+            return back()->withErrors($validatorPatient)->withInput();
+        }
+    }
+
+    // Validation pour le rôle MÉDECIN
+    if ($request->role == 'medecin') {
+        $validatorMedecin = validator($request->all(), [
+            'specialite' => ['required', 'string'],
+            'diplome' => ['required', 'string'],
+            'annee_experience' => ['required', 'integer', 'min:0'],
+        ]);
+        
+        if ($validatorMedecin->fails()) {
+            return back()->withErrors($validatorMedecin)->withInput();
+        }
+    }
+
+    // Création de l'utilisateur
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => $request->role,
+    ]);
+
+    // Création du dossier PATIENT
+    if ($request->role == 'patient') {
+        Patient::create([
+            'user_id' => $user->id,
+            'date_naissance' => $request->date_naissance,
+            'telephone' => $request->telephone,
+            'adresse' => $request->adresse,
+        ]);
+    }
+
+    // Création du dossier MÉDECIN
+    if ($request->role == 'medecin') {
+        Medecin::create([
+            'user_id' => $user->id,
+            'specialite' => $request->specialite,
+            'diplome' => $request->diplome,
+            'annee_experience' => $request->annee_experience,
+        ]);
+    }
+
+    event(new Registered($user));
+    Auth::login($user);
+
+    return redirect(route('dashboard', absolute: false))->with('success', 'Compte créé avec succès !');
+}
 }

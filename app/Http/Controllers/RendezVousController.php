@@ -22,6 +22,25 @@ class RendezVousController extends Controller
         $request->validate([
             'medecin_id' => 'required|exists:medecins,id',
             'date_heure' => 'required|date',
+        ]);
+
+        // Cas 1 : Utilisateur connecté et a un dossier patient
+        if (Auth::check() && Auth::user()->role == 'patient' && Auth::user()->patient) {
+            $patient = Auth::user()->patient;
+            
+            RendezVous::create([
+                'patient_id' => $patient->id,
+                'medecin_id' => $request->medecin_id,
+                'date_heure' => $request->date_heure,
+                'motif' => $request->motif,
+                'statut' => 'en_attente',
+            ]);
+            
+            return redirect()->route('dashboard')->with('success', 'Rendez-vous réservé avec succès !');
+        }
+        
+        // Cas 2 : Utilisateur non connecté OU pas de dossier patient
+        $request->validate([
             'patient_name' => 'required|string',
             'patient_email' => 'required|email',
             'patient_telephone' => 'required|string',
@@ -62,24 +81,23 @@ class RendezVousController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Rendez-vous réservé avec succès ! Un compte patient a été créé.');
     }
-public function destroy($id)
-{
-    $rdv = RendezVous::findOrFail($id);
     
-    // Vérifier que le patient est bien le propriétaire
-    if ($rdv->patient_id != Auth::user()->patient->id) {
-        abort(403);
+    public function destroy($id)
+    {
+        $rdv = RendezVous::findOrFail($id);
+        
+        if ($rdv->patient_id != Auth::user()->patient->id) {
+            abort(403);
+        }
+        
+        $rdv->statut = 'annule';
+        $rdv->save();
+        
+        return redirect()->route('rendez-vous.index')->with('success', 'Rendez-vous annulé avec succès.');
     }
-    
-    $rdv->statut = 'annule';
-    $rdv->save();
-    
-    return redirect()->route('rendez-vous.index')->with('success', 'Rendez-vous annulé avec succès.');
-}
     
     public function index()
     {
-        // Vérifier si l'utilisateur est connecté et a un dossier patient
         if (!Auth::check()) {
             return redirect()->route('login');
         }

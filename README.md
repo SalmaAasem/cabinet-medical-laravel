@@ -1,4 +1,4 @@
-# Guide d'installation détaillé - Cabinet Médical
+ *************************Guide d'installation détaillé - Cabinet Médical***************************
 
 Ce document explique étape par étape comment installer et configurer l'application **Cabinet Médical** sur votre machine.
 

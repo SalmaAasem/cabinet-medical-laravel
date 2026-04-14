@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <!-- Header Card - Même couleur que les autres pages -->
+            <!-- Header Card -->
             <div class="card shadow-lg border-0 rounded-4 mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <div class="card-body p-4 text-white">
                     <div class="row align-items-center">
@@ -59,6 +59,7 @@
                                 <i class="fas fa-calendar-alt text-primary me-1"></i> Date et heure
                             </label>
                             <input type="datetime-local" name="date_heure" id="date_heure" class="form-control form-control-lg rounded-3 @error('date_heure') is-invalid @enderror" required>
+                            <small class="text-muted">Format: JJ/MM/AAAA HH:MM</small>
                             @error('date_heure')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -89,14 +90,64 @@
 
                         <!-- Message pour utilisateur connecté -->
                         @auth
-                            <div class="alert alert-info rounded-3 mb-4" style="background: #f0e6ff; border-color: #667eea;">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-user-circle fa-2x me-3" style="color: #667eea;"></i>
-                                    <div>
-                                        <strong class="fs-5">Vous êtes connecté</strong><br>
-                                        <span>Compte : {{ Auth::user()->name }} ({{ Auth::user()->role }})</span>
-                                    </div>
+                            @if(Auth::user()->role == 'patient')
+                                <!-- Patient connecté : pas besoin de ressaisir les infos -->
+                                <div class="alert alert-info rounded-3 mb-4">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Vous êtes connecté en tant que : {{ Auth::user()->name }}</strong><br>
+                                    Vos informations sont déjà enregistrées. Cliquez simplement sur "Réserver".
                                 </div>
+                                <input type="hidden" name="patient_name" value="{{ Auth::user()->name }}">
+                                <input type="hidden" name="patient_email" value="{{ Auth::user()->email }}">
+                                <input type="hidden" name="patient_telephone" value="{{ Auth::user()->patient->telephone ?? '' }}">
+                                <input type="hidden" name="patient_date_naissance" value="{{ Auth::user()->patient->date_naissance ?? '' }}">
+                                <input type="hidden" name="patient_adresse" value="{{ Auth::user()->patient->adresse ?? '' }}">
+                            @else
+                                <!-- Autre rôle connecté (médecin, admin) : afficher le formulaire -->
+                                <h4>Vos informations</h4>
+                                <div class="mb-3">
+                                    <label>Nom complet</label>
+                                    <input type="text" name="patient_name" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Email</label>
+                                    <input type="email" name="patient_email" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Téléphone</label>
+                                    <input type="text" name="patient_telephone" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Date de naissance</label>
+                                    <input type="date" name="patient_date_naissance" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label>Adresse</label>
+                                    <textarea name="patient_adresse" class="form-control" rows="2"></textarea>
+                                </div>
+                            @endif
+                        @else
+                            <!-- Non connecté : afficher le formulaire complet -->
+                            <h4>Vos informations</h4>
+                            <div class="mb-3">
+                                <label>Nom complet</label>
+                                <input type="text" name="patient_name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Email</label>
+                                <input type="email" name="patient_email" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Téléphone</label>
+                                <input type="text" name="patient_telephone" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label>Date de naissance</label>
+                                <input type="date" name="patient_date_naissance" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label>Adresse</label>
+                                <textarea name="patient_adresse" class="form-control" rows="2"></textarea>
                             </div>
                         @endauth
 

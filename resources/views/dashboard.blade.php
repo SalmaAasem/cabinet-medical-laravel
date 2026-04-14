@@ -2,6 +2,22 @@
 
 @section('content')
 <div class="container mt-4">
+
+    <!-- Messages de succès et d'erreur -->
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <!-- Welcome Card -->
     <div class="row">
         <div class="col-12">
@@ -35,45 +51,44 @@
     </div>
 
     <!-- Stats Cards -->
-    <!-- Stats Cards avec vraies données -->
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 rounded-4 text-center p-3">
-            <div class="card-body">
-                <i class="fas fa-calendar-check fa-3x text-primary mb-2"></i>
-                <h3 class="fw-bold mb-0">{{ $rdvAujourdhui ?? 0 }}</h3>
-                <p class="text-muted mb-0">Rendez-vous aujourd'hui</p>
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+                <div class="card-body">
+                    <i class="fas fa-calendar-check fa-3x text-primary mb-2"></i>
+                    <h3 class="fw-bold mb-0">{{ $rdvAujourdhui ?? 0 }}</h3>
+                    <p class="text-muted mb-0">Rendez-vous aujourd'hui</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+                <div class="card-body">
+                    <i class="fas fa-users fa-3x text-success mb-2"></i>
+                    <h3 class="fw-bold mb-0">{{ $totalPatients ?? 0 }}</h3>
+                    <p class="text-muted mb-0">Patients total</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+                <div class="card-body">
+                    <i class="fas fa-user-md fa-3x text-info mb-2"></i>
+                    <h3 class="fw-bold mb-0">{{ $totalMedecins ?? 0 }}</h3>
+                    <p class="text-muted mb-0">Médecins</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 rounded-4 text-center p-3">
+                <div class="card-body">
+                    <i class="fas fa-chart-line fa-3x text-warning mb-2"></i>
+                    <h3 class="fw-bold mb-0">{{ $consultationsMois ?? 0 }}</h3>
+                    <p class="text-muted mb-0">Consultations ce mois</p>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 rounded-4 text-center p-3">
-            <div class="card-body">
-                <i class="fas fa-users fa-3x text-success mb-2"></i>
-                <h3 class="fw-bold mb-0">{{ $totalPatients ?? 0 }}</h3>
-                <p class="text-muted mb-0">Patients total</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 rounded-4 text-center p-3">
-            <div class="card-body">
-                <i class="fas fa-user-md fa-3x text-info mb-2"></i>
-                <h3 class="fw-bold mb-0">{{ $totalMedecins ?? 0 }}</h3>
-                <p class="text-muted mb-0">Médecins</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 rounded-4 text-center p-3">
-            <div class="card-body">
-                <i class="fas fa-chart-line fa-3x text-warning mb-2"></i>
-                <h3 class="fw-bold mb-0">{{ $consultationsMois ?? 0 }}</h3>
-                <p class="text-muted mb-0">Consultations ce mois</p>
-            </div>
-        </div>
-    </div>
-</div>
 
     <!-- Quick Actions -->
     <div class="row">
@@ -125,7 +140,7 @@
         </div>
     </div>
 
-    <!-- Recent Activity (optional) -->
+    <!-- Recent Activity -->
     <div class="row mt-4">
         <div class="col-12">
             <div class="card shadow-lg border-0 rounded-4">

@@ -33,7 +33,12 @@
                         @if(Auth::user()->role == 'medecin')
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('medecin.rendez-vous') }}">
-                                <i class="fas fa-stethoscope"></i> Mes consultations
+                                <i class="fas fa-calendar-alt"></i> Mes consultations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('medecin.patients') }}">
+                                <i class="fas fa-users"></i> Mes patients
                             </a>
                         </li>
                         @endif

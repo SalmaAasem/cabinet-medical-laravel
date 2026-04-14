@@ -25,6 +25,25 @@ class GestionRdvController extends Controller
         
         return redirect()->route('gestion-rdv.index')->with('success', 'Statut mis à jour');
     }
+public function search(Request $request)
+{
+    $search = $request->input('search');
+    
+    $rendezVous = RendezVous::with('patient.user', 'medecin.user')
+        ->where(function($query) use ($search) {
+            $query->whereHas('patient.user', function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            })
+            ->orWhereHas('medecin.user', function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            })
+            ->orWhere('date_heure', 'like', '%' . $search . '%');
+        })
+        ->orderBy('date_heure', 'desc')
+        ->get();
+    
+    return view('gestion-rdv.index', compact('rendezVous', 'search'));
+}
     
     public function destroy($id)
     {
