@@ -17,10 +17,25 @@ class AuthenticatedSessionController extends Controller
     }
 
     public function store(LoginRequest $request): RedirectResponse
-    {
+    {   
+        
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         $request->authenticate();
         $request->session()->regenerate();
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = Auth::user();
+
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'medecin') {
+            return redirect()->route('medecin.rendez-vous');
+        } elseif ($user->role === 'secretaire') {
+            return redirect()->route('secretaire.dashboard');
+        } else {
+            return redirect()->route('dashboard');
+        }
     }
 
     public function destroy(Request $request): RedirectResponse
