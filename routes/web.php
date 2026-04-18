@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\RendezVousController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
@@ -14,7 +15,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', function() {
+    $user = Auth::user();
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    } elseif ($user->role === 'medecin') {
+        return redirect()->route('medecin.rendez-vous');
+    } elseif ($user->role === 'secretaire') {
+        return redirect()->route('secretaire.dashboard');
+    }
+    return app(App\Http\Controllers\DashboardController::class)->index();
+})->middleware(['auth'])->name('dashboard');
 
 Route::get('/ordonnance/{id}/pdf', [App\Http\Controllers\OrdonnanceController::class, 'pdf'])->name('ordonnance.pdf');
 
