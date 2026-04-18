@@ -2,10 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\RendezVousController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AdminController;
 use App\Models\User;
 use App\Models\Patient;
 use App\Models\RendezVous;
@@ -15,18 +13,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function() {
-    $user = Auth::user();
-    if ($user->role === 'admin') {
-        return redirect()->route('admin.dashboard');
-    } elseif ($user->role === 'medecin') {
-        return redirect()->route('medecin.rendez-vous');
-    } elseif ($user->role === 'secretaire') {
-        return redirect()->route('secretaire.dashboard');
-    }
-
-    return redirect()->route('login');
-})->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::get('/ordonnance/{id}/pdf', [App\Http\Controllers\OrdonnanceController::class, 'pdf'])->name('ordonnance.pdf');
 
@@ -56,21 +43,22 @@ Route::get('/secretaire/patients', function () {
     return view('secretaire.patients', compact('patients'));
 })->name('patients.index');
 
- 
-// ─── MODULE ADMINISTRATION (protégé auth + rôle admin) ───────────────────────
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
- 
-    // Tableau de bord admin avec statistiques et graphiques
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
- 
-    // Gestion des utilisateurs
-    Route::get('/users',              [AdminController::class, 'users'])->name('users');
-    Route::get('/users/create',       [AdminController::class, 'createUser'])->name('users.create');
-    Route::post('/users',             [AdminController::class, 'storeUser'])->name('users.store');
-    Route::get('/users/{user}/edit',  [AdminController::class, 'editUser'])->name('users.edit');
-    Route::put('/users/{user}',       [AdminController::class, 'updateUser'])->name('users.update');
-    Route::delete('/users/{user}',    [AdminController::class, 'destroyUser'])->name('users.destroy');
+Route::get('/admin/users', function () {
+    try {
+        $users = User::all();
+        return view('admin.users', compact('users'));
+    } catch (\Exception $e) {
+        return "Erreur : " . $e->getMessage();
+    }
+})->name('admin.users');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/prendre-rendez-vous', [RendezVousController::class, 'create'])->name('rendez-vous.create');
+    Route::post('/rendez-vous', [RendezVousController::class, 'store'])->name('rendez-vous.store');
+    Route::get('/mes-rendez-vous', [RendezVousController::class, 'index'])->name('rendez-vous.index');
+    Route::delete('/rendez-vous/{id}', [RendezVousController::class, 'destroy'])->name('rendez-vous.destroy'); // ← AJOUTER CETTE LIGNE
 });
+
 // Routes pour les médecins
 Route::middleware(['auth'])->group(function () {
     Route::get('/medecin/rendez-vous', [App\Http\Controllers\ConsultationController::class, 'index'])->name('medecin.rendez-vous');

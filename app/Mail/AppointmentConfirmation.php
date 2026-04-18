@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Mail;
-
+use App\Models\RendezVous;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -13,15 +13,12 @@ use Illuminate\Queue\SerializesModels;
 class AppointmentConfirmation extends Mailable
 {
     use Queueable, SerializesModels;
-    public $appointment;
-    /**
-     * Create a new message instance.
-     */
+    public $rdv;
+
     public function __construct($appointment)
     {
-
-        $this->appointment = $appointment;
-    }
+        $this->rdv = $appointment;
+    }  
 
     /**
      * Get the message envelope.
@@ -29,7 +26,7 @@ class AppointmentConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirmation de votre Rendez-vous',
+            subject: 'Demande de Rendez-vous reçue',
         );
     }
 

@@ -10,8 +10,10 @@ return new class extends Migration
     {
         Schema::create('consultations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('rendez_vous_id');
-            $table->foreign('rendez_vous_id')->references('id')->on('rendez_vous')->onDelete('cascade');
+            
+            $table->foreignId('rendez_vous_id')->constrained('rendez_vous')->onDelete('cascade');
+            $table->foreignId('patient_id')->constrained('patients')->onDelete('cascade'); 
+            $table->foreignId('medecin_id')->constrained('medecins')->onDelete('cascade');
             $table->text('diagnostic');
             $table->text('traitement');
             $table->text('notes')->nullable();
