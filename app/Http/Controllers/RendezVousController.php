@@ -13,92 +13,77 @@ use App\Mail\AppointmentConfirmation;
 
 class RendezVousController extends Controller
 {
+
     public function create()
     {
+       
         $medecins = Medecin::with('user')->get();
         return view('rendezvous.create', compact('medecins'));
     }
     
+
     public function store(Request $request)
     {
+        
         $request->validate([
             'medecin_id' => 'required|exists:medecins,id',
-            'date_heure' => 'required|date',
-            'patient_name' => 'required|string',
-            'patient_email' => 'required|email',
-            'patient_telephone' => 'required|string',
+            'date_heure' => 'required|date|after:now', 
+            'motif'      => 'nullable|string|max:255',
         ]);
 
-        // Vérifier si le patient existe déjà
-        $user = User::where('email', $request->patient_email)->first();
-
-        if (!$user) {
-            // Créer automatiquement le patient
-            $user = User::create([
-                'name' => $request->patient_name,
-                'email' => $request->patient_email,
-                'password' => bcrypt('password123'),
-                'role' => 'patient',
-            ]);
-
-            // Créer son dossier patient
-            Patient::create([
-                'user_id' => $user->id,
-                'date_naissance' => $request->patient_date_naissance ?? null,
-                'telephone' => $request->patient_telephone,
-                'adresse' => $request->patient_adresse ?? null,
-            ]);
-        }
-
-        // Récupérer le patient
+        $user = Auth::user();
         $patient = $user->patient;
 
-        // Créer le rendez-vous
-        RendezVous::create([
+        if (!$patient) {
+            return redirect()->route('dashboard')->with('error', 'Dossier patient introuvable.');
+        }
+
+        $appointment = RendezVous::create([
             'patient_id' => $patient->id,
             'medecin_id' => $request->medecin_id,
             'date_heure' => $request->date_heure,
-            'motif' => $request->motif,
-            'statut' => 'en_attente',
+            'motif'      => $request->motif,
+            'statut'     => 'en_attente',
         ]);
 
-        Mail::to($request->patient_email)->send(new AppointmentConfirmation($request->all()));
+        Mail::to($user->email)->send(new AppointmentConfirmation($appointment));
+
         
-        return redirect()->route('dashboard')->with('success', 'Rendez-vous réservé avec succès ! Un compte patient a été créé.');
+        // 5. Success
+        return redirect()->route('rendez-vous.index')->with('success', 'Votre rendez-vous a été enregistré. Un email de confirmation vous a été envoyé.');
     }
-public function destroy($id)
-{
-    $rdv = RendezVous::findOrFail($id);
-    
-    // Vérifier que le patient est bien le propriétaire
-    if ($rdv->patient_id != Auth::user()->patient->id) {
-        abort(403);
-    }
-    
-    $rdv->statut = 'annule';
-    $rdv->save();
-    
-    return redirect()->route('rendez-vous.index')->with('success', 'Rendez-vous annulé avec succès.');
-}
+
     
     public function index()
     {
-        // Vérifier si l'utilisateur est connecté et a un dossier patient
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-        
         $patient = Auth::user()->patient;
         
         if (!$patient) {
-            return redirect()->route('dashboard')->with('error', 'Vous devez compléter votre dossier patient.');
+            return redirect()->route('dashboard')->with('error', 'Profil patient non trouvé.');
         }
         
         $rendezVous = RendezVous::where('patient_id', $patient->id)
             ->with('medecin.user')
-            ->orderBy('date_heure', 'desc')
+            ->orderBy('date_heure', 'asc')
             ->get();
         
         return view('rendezvous.index', compact('rendezVous'));
+    }
+
+    /**
+     * حذف أو إلغاء الموعد
+     */
+    public function destroy($id)
+    {
+        $rdv = RendezVous::findOrFail($id);
+        
+        // حماية: المريض يقدر يمسح غير المواعيد ديالو هو فقط
+        if ($rdv->patient_id != Auth::user()->patient->id) {
+            abort(403, 'Action non autorisée.');
+        }
+        
+        $rdv->delete();
+        
+        return redirect()->route('rendez-vous.index')->with('success', 'Le rendez-vous a été supprimé avec succès.');
     }
 }

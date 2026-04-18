@@ -96,20 +96,23 @@
                             @foreach($patients as $patient)
                             <tr>
                                 <td>
-                                    <div class="fw-semibold">{{ $patient->user->name }}</div>
+                                    <div class="fw-semibold">{{ $patient->user->name ?? 'N/A' }}</div>
                                 </td>
-                                <td>{{ $patient->user->email }}</td>
+                                <td>{{ $patient->user->email ?? 'N/A' }}</td>
                                 <td>{{ $patient->telephone }}</td>
                                 <td>{{ $patient->date_naissance }}</td>
                                 <td>{{ $patient->adresse }}</td>
                                 <td>
-                                    <a href="{{ route('patients.edit', $patient->id) }}" class="btn btn-sm btn-warning rounded-3">
-                                        <i class="fas fa-edit"></i> Modifier
-                                    </a>
-                                    <a href="{{ route('patients.historique', $patient->id) }}" class="btn btn-sm btn-info rounded-3">
-                                        <i class="fas fa-history"></i> Historique
-                                    </a>
-                                 </td>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('patients.edit', $patient->id) }}" class="btn btn-sm btn-warning rounded-3">
+                                            <i class="fas fa-edit"></i> Modifier
+                                        </a>
+
+                                        <a href="{{ route('patients.historique', $patient->id) }}" class="btn btn-sm btn-info rounded-3">
+                                            <i class="fas fa-history"></i> Historique
+                                        </a>
+                                    </div>    
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
