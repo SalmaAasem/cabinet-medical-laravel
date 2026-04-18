@@ -24,7 +24,8 @@ Route::get('/dashboard', function() {
     } elseif ($user->role === 'secretaire') {
         return redirect()->route('secretaire.dashboard');
     }
-    return app(App\Http\Controllers\DashboardController::class)->index();
+
+    return redirect()->route('login');
 })->middleware(['auth'])->name('dashboard');
 
 Route::get('/ordonnance/{id}/pdf', [App\Http\Controllers\OrdonnanceController::class, 'pdf'])->name('ordonnance.pdf');
