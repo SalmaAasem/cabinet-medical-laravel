@@ -77,15 +77,31 @@ class PatientController extends Controller
     }
 
     // Display the medical history of a patient
-    public function historique($id)
+    public function myHistory()
     {
         // Load patient with consultations and doctors
-        $patient = Patient::with(['user', 'consultations.medecin'])->findOrFail($id);
+        $patient = Patient::with(['user', 'consultations.medecin.user'])
+        ->where('user_id', Auth::id())
+        ->firstOrFail();
         $consultations = $patient->consultations; 
+
         $user = Auth::user();
 
         return view('patients.historique', compact('patient', 'consultations', 'user'));
     }
+    
+    // هاد الدالة خاصة بالسكريتيرة باش تشوف تاريخ أي مريض عن طريق الـ ID ديالو
+public function historique($id)
+{
+    // كنجيبو المريض بالـ ID ديالو مع الاستشارات
+    $patient = Patient::with(['user', 'consultations.medecin.user'])->findOrFail($id);
+    
+    // كنجيبو الاستشارات مرتبة من الأحدث
+    $consultations = $patient->consultations()->orderBy('created_at', 'desc')->get();
+
+    // كنصيفطوهم لنفس الـ View اللي صاوبنا
+    return view('patients.historique', compact('patient', 'consultations'));
+}
 
     // Search for patients
     public function search(Request $request)
