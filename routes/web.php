@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrdonnanceController;
+use App\Http\Controllers\MedecinController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\GestionRdvController;
 use App\Models\User;
@@ -16,7 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth' , 'role:medecin,secretaire,admin'])->group(function () {
     
     // 1. Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -31,6 +32,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/patients/{id}/historique', [PatientController::class, 'historique'])->name('patients.historique');
     Route::resource('patients', PatientController::class);
     Route::get('/secretaire/patients', [PatientController::class, 'index'])->name('secretaire.patients.index');
+     
+    // رابط خاص بالمريض يشوف تاريخو
+    Route::get('/mon-historique', [PatientController::class, 'myHistory'])
+        ->name('patient.my_history')
+        ->middleware('auth');
 
     // 4. Appointment (Rendez-vous)
     Route::get('/prendre-rendez-vous', [RendezVousController::class, 'create'])->name('rendez-vous.create');
@@ -40,6 +46,8 @@ Route::middleware(['auth'])->group(function () {
 
     // 5. Doctor Interface (Consultations)
     Route::get('/medecin/rendez-vous', [ConsultationController::class, 'index'])->name('medecin.rendez-vous');
+    Route::get('/medecin/patients', [MedecinController::class, 'listPatients'])->name('medecin.patients.index');
+    Route::get('/medecin/patient/{id}/history', [MedecinController::class, 'showHistory'])->name('medecin.patient.history');
     Route::get('/medecin/consultation/{id}', [ConsultationController::class, 'create'])->name('medecin.consultation.create');
     Route::post('/medecin/consultation', [ConsultationController::class, 'store'])->name('medecin.consultation.store');
     Route::get('/ordonnance/{id}/pdf', [OrdonnanceController::class, 'pdf'])->name('ordonnance.pdf');
