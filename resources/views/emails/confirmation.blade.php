@@ -1,44 +1,37 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <meta charset="UTF-8">
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; line-height: 1.6; }
-        .container { width: 80%; margin: 20px auto; background: #ffffff; padding: 30px; border-radius: 8px; border-top: 5px solid #007bff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { color: #007bff; margin: 0; }
-        .content { margin-bottom: 30px; }
-        .details { background-color: #e9ecef; padding: 20px; border-radius: 5px; margin: 20px 0; }
-        .footer { text-align: center; font-size: 12px; color: #777; margin-top: 30px; }
-        .button { display: inline-block; padding: 10px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .container { max-width: 600px; margin: 20px auto; background: #ffffff; padding: 30px; border-radius: 12px; border-top: 6px solid #667eea; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+        .content { padding: 20px 0; }
+        .info-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #667eea; }
+        .footer { text-align: center; font-size: 12px; color: #777; margin-top: 20px; }
+        .badge { background: #f0ad4e; color: white; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Cabinet Médical</h1>
-            <p>Confirmation de votre rendez-vous</p>
+            <h2 style="color: #4a5568;">Demande Reçue 📩</h2>
         </div>
-
         <div class="content">
-            <p>Bonjour,</p>
-            <p>Nous avons le plaisir de vous confirmer que votre rendez-vous a bien été enregistré dans notre cabinet.</p>
+            <p>Bonjour <strong>{{ $rdv->patient->user->name }}</strong>,</p>
+            <p>Nous avons bien reçu votre demande de rendez-vous. Actuellement, elle est <span class="badge">En attente de traitement</span>.</p>
             
-            <div class="details">
-                <strong>🗓️ Date :</strong> {{ $appointment->date }} <br>
-                <strong>👨‍⚕️ Médecin :</strong> Dr. {{ $appointment->medecin->name ?? 'Alaoui' }} <br>
-                <strong>📍 Lieu :</strong> Rue Mohammed V, Casablanca
+            <div class="info-box">
+                <p style="margin: 0;"><strong>Détails du RDV :</strong></p>
+                <ul style="list-style: none; padding: 0;">
+                    <li> Médecin : Dr. {{ $rdv->medecin->user->name }}</li>
+                    <li> Date : {{ \Carbon\Carbon::parse($rdv->date_heure)->format('d/m/Y H:i') }}</li>
+                </ul>
             </div>
-
-            <p>Si vous avez besoin de modifier ou d'annuler ce rendez-vous, merci de nous contacter au moins 24 heures à l'avance.</p>
+            
+            <p>La secrétaire va examiner votre demande et vous recevrez un email dès qu'elle sera confirmée.</p>
         </div>
-
-        <div class="header">
-            <a href="#" class="button">Voir mon calendrier</a>
-        </div>
-
         <div class="footer">
-            &copy; 2026 Cabinet Médical - Votre santé est notre priorité.
+            <p>&copy; {{ date('Y') }} Cabinet Médical - Tous droits réservés.</p>
         </div>
     </div>
 </body>

@@ -76,54 +76,54 @@
 </div>
 
     <!-- Quick Actions -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header bg-white border-0 pt-4 pb-0">
-                    <h4 class="mb-0 fw-bold">
-                        <i class="fas fa-bolt text-primary me-2"></i> Actions rapides
-                    </h4>
-                </div>
-                <div class="card-body p-4">
-                    <div class="row g-3">
-                        @if(Auth::user()->role == 'patient')
-                        <div class="col-md-6">
-                            <a href="{{ route('rendez-vous.create') }}" class="btn btn-primary w-100 py-3 rounded-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
-                                <i class="fas fa-calendar-plus me-2"></i> Prendre un rendez-vous
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="{{ route('rendez-vous.index') }}" class="btn btn-outline-primary w-100 py-3 rounded-3">
-                                <i class="fas fa-list me-2"></i> Voir mes rendez-vous
-                            </a>
-                        </div>
-                        @endif
-
-                        @if(Auth::user()->role == 'medecin')
-                        <div class="col-md-6">
-                            <a href="{{ route('medecin.rendez-vous') }}" class="btn btn-primary w-100 py-3 rounded-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
-                                <i class="fas fa-stethoscope me-2"></i> Mes consultations
-                            </a>
-                        </div>
-                        @endif
-
-                        @if(Auth::user()->role == 'secretaire' || Auth::user()->role == 'admin')
-                        <div class="col-md-6">
-                            <a href="{{ route('patients.create') }}" class="btn btn-primary w-100 py-3 rounded-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
-                                <i class="fas fa-user-plus me-2"></i> Ajouter un patient
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="{{ route('gestion-rdv.index') }}" class="btn btn-outline-primary w-100 py-3 rounded-3">
-                                <i class="fas fa-calendar-alt me-2"></i> Gérer les rendez-vous
-                            </a>
-                        </div>
-                        @endif
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <h4 class="mb-0 fw-bold">
+                    <i class="fas fa-bolt text-primary me-2"></i> Actions rapides
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    
+                   
+                    @if(Auth::user()->role == 'medecin')
+                    <div class="col-md-6">
+                        <a href="{{ route('medecin.rendez-vous') }}" class="btn btn-primary w-100 py-3 rounded-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                            <i class="fas fa-stethoscope me-2"></i> Mes consultations
+                        </a>
                     </div>
+                    <div class="col-md-6">
+                        <a href="{{ route('patients.index') }}" class="btn btn-outline-primary w-100 py-3 rounded-3">
+                            <i class="fas fa-file-medical me-2"></i> Gestion Patients & Historique
+                        </a>
+                    </div>
+                    @endif
+
+                    @if(Auth::user()->role == 'secretaire' || Auth::user()->role == 'admin')
+                    <div class="col-md-4">
+                        <a href="{{ route('patients.create') }}" class="btn btn-primary w-100 py-3 rounded-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                            <i class="fas fa-user-plus me-2"></i> Ajouter un patient
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ route('patients.index') }}" class="btn btn-info text-white w-100 py-3 rounded-3">
+                            <i class="fas fa-list me-2"></i> Liste des Patients
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{{ route('gestion-rdv.index') }}" class="btn btn-outline-primary w-100 py-3 rounded-3">
+                            <i class="fas fa-calendar-alt me-2"></i> Gérer les rendez-vous
+                        </a>
+                    </div>
+                    @endif
+
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Recent Activity (optional) -->
     <div class="row mt-4">
