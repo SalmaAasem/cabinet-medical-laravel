@@ -14,85 +14,65 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ── Admin (mariam) ──
+        // 1. إنشاء Admin
         User::create([
-            'name'     => 'Administrateur',
-            'email'    => 'admin@cabinet.com',
-            'password' => Hash::make('admin123'),
-            'role'     => 'admin',
-        ]);
-
-        // ── Secrétaire (mariam) ──
-        User::create([
-            'name'     => 'Secrétaire',
-            'email'    => 'secretaire@cabinet.com',
-            'password' => Hash::make('secret123'),
-            'role'     => 'secretaire',
-        ]);
-
-        // ── Admin (fatima) ──
-        User::create([
-            'name'     => 'Admin User',
-            'email'    => 'admin@gmail.com',
+            'name' => 'Admin User',
+            'email' => 'admin@gmail.com',
             'password' => Hash::make('password'),
-            'role'     => 'admin',
+            'role' => 'admin',
         ]);
 
-        // ── Secrétaire (fatima) ──
+        // 2. إنشاء Secretaire
         User::create([
-            'name'     => 'Secretaire Fatima',
-            'email'    => 'secretaire@gmail.com',
+            'name' => 'Secretaire Fatima',
+            'email' => 'secretaire@gmail.com',
             'password' => Hash::make('password'),
-            'role'     => 'secretaire',
+            'role' => 'secretaire',
         ]);
 
-        // ── Médecin (fatima) ──
+        // 3. إنشاء Medecin
         $userMed = User::create([
-            'name'     => 'Dr. Ahmed Rayane',
-            'email'    => 'medecin@gmail.com',
+            'name' => 'Dr. Ahmed Rayane',
+            'email' => 'medecin@gmail.com',
             'password' => Hash::make('password'),
-            'role'     => 'medecin',
+            'role' => 'medecin',
         ]);
         $medecin = Medecin::create([
-            'user_id'          => $userMed->id,
-            'specialite'       => 'Cardiologue',
-            'diplome'          => 'Doctorat en Médecine',
+            'user_id' => $userMed->id,
+            'specialite' => 'Cardiologue',
+            'diplome' => 'Doctorat en Médecine',
             'annee_experience' => 10,
         ]);
 
-        // ── Patient (fatima) ──
+        // 4. إنشاء Patient
         $userPat = User::create([
-            'name'     => 'Salma Bennani',
-            'email'    => 'patient@gmail.com',
+            'name' => 'Salma Bennani',
+            'email' => 'patient@gmail.com',
             'password' => Hash::make('password'),
-            'role'     => 'patient',
+            'role' => 'patient',
         ]);
         $patient = Patient::create([
-            'user_id'   => $userPat->id,
+            'user_id' => $userPat->id,
             'telephone' => '0600000000',
         ]);
 
-        // ── Rendez-vous (fatima) ──
+        // 5. إنشاء Rendez-vous (موعد قديم باش نديرو ليه استشارة)
         $rdv = RendezVous::create([
             'patient_id' => $patient->id,
             'medecin_id' => $medecin->id,
-            'date_heure' => now()->subDays(2),
-            'statut'     => 'confirme',
-            'motif'      => 'Consultation de routine',
+            'date_heure' => now()->subDays(2), // موعد قبل يومين
+            'statut' => 'confirme',
+            'motif' => 'Consultation de routine',
         ]);
 
-        // ── Consultation (fatima) ──
+        // 6. إنشاء Consultation (التاريخ الطبي)
         Consultation::create([
             'rendez_vous_id' => $rdv->id,
-            'diagnostic'     => 'Hypertension légère détectée.',
-            'traitement'     => 'Amlodipine 5mg, une fois par jour.',
-            'notes'          => 'À revoir dans 3 mois.',
-        ]);
-
-        // ── Médecins + Patients seeders (mariam) ──
-        $this->call([
-            MedecinSeeder::class,
-            PatientSeeder::class,
+            'patient_id' => $patient->id,
+            'medecin_id' => $medecin->id,
+            'diagnostic' => 'Hypertension légère détectée.',
+            'traitement' => 'Amlodipine 5mg, une fois par jour.',
+            'notes' => 'À revoir dans 3 mois.',
         ]);
     }
 }
