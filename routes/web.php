@@ -1,8 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\RendezVousController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrdonnanceController;
@@ -17,34 +20,49 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth' , 'role:medecin,secretaire,admin'])->group(function () {
-    
-    // 1. Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// ── Dashboard avec redirect selon rôle ──
+Route::get('/dashboard', function() {
+    $user = Auth::user();
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    } elseif ($user->role === 'medecin') {
+        return redirect()->route('medecin.rendez-vous');
+    } elseif ($user->role === 'secretaire') {
+        return redirect()->route('secretaire.dashboard');
+    }
+    return redirect()->route('login');
+})->middleware(['auth'])->name('dashboard');
 
-    // 2. Profile
+Route::middleware(['auth'])->group(function () {
+
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // 3. Patients Management 
+    // Patients
     Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
     Route::get('/patients/{id}/historique', [PatientController::class, 'historique'])->name('patients.historique');
     Route::resource('patients', PatientController::class);
-    Route::get('/secretaire/patients', [PatientController::class, 'index'])->name('secretaire.patients.index');
-     
-    // رابط خاص بالمريض يشوف تاريخو
-    Route::get('/mon-historique', [PatientController::class, 'myHistory'])
-        ->name('patient.my_history')
-        ->middleware('auth');
+    Route::get('/mon-historique', [PatientController::class, 'myHistory'])->name('patient.my_history');
 
-    // 4. Appointment (Rendez-vous)
+    // Rendez-vous
     Route::get('/prendre-rendez-vous', [RendezVousController::class, 'create'])->name('rendez-vous.create');
     Route::post('/prendre-rendez-vous', [RendezVousController::class, 'store'])->name('rendez-vous.store');
     Route::get('/mes-rendez-vous', [RendezVousController::class, 'index'])->name('rendez-vous.index');
     Route::delete('/rendez-vous/{id}', [RendezVousController::class, 'destroy'])->name('rendez-vous.destroy');
 
-    // 5. Doctor Interface (Consultations)
+    Route::post('/rdv/store', function (Request $request) {
+        RendezVous::create([
+            'patient_id' => $request->patient_id,
+            'specialite' => $request->specialite,
+            'date_rdv'   => $request->date_rdv,
+            'statut'     => 'En attente'
+        ]);
+        return back()->with('success', 'Rendez-vous ajouté avec succès !');
+    })->name('rdv.store');
+
+    // Médecin
     Route::get('/medecin/rendez-vous', [ConsultationController::class, 'index'])->name('medecin.rendez-vous');
     Route::get('/medecin/patients', [MedecinController::class, 'listPatients'])->name('medecin.patients.index');
     Route::get('/medecin/patient/{id}/history', [MedecinController::class, 'showHistory'])->name('medecin.patient.history');
@@ -52,7 +70,7 @@ Route::middleware(['auth' , 'role:medecin,secretaire,admin'])->group(function ()
     Route::post('/medecin/consultation', [ConsultationController::class, 'store'])->name('medecin.consultation.store');
     Route::get('/ordonnance/{id}/pdf', [OrdonnanceController::class, 'pdf'])->name('ordonnance.pdf');
 
-    // 6. Secretary and Admin Interface
+    // Secrétaire
     Route::get('/secretaire/dashboard', function () {
         $total_patients = Patient::count();
         $total_rdv = RendezVous::count();
@@ -61,16 +79,23 @@ Route::middleware(['auth' , 'role:medecin,secretaire,admin'])->group(function ()
         return view('secretaire.dashboard', compact('total_patients', 'total_rdv', 'rdv_today', 'recent_rdvs'));
     })->name('secretaire.dashboard');
 
-    // Appointments Management
+    Route::get('/secretaire/patients', [PatientController::class, 'index'])->name('secretaire.patients.index');
+
+    // Gestion RDV
     Route::get('/gestion-rdv', [GestionRdvController::class, 'index'])->name('gestion-rdv.index');
     Route::put('/gestion-rdv/{id}', [GestionRdvController::class, 'update'])->name('gestion-rdv.update');
     Route::delete('/gestion-rdv/{id}', [GestionRdvController::class, 'destroy'])->name('gestion-rdv.destroy');
+});
 
-    // Users Management (Admin)
-    Route::get('/admin/users', function () {
-        $users = User::all();
-        return view('admin.users', compact('users'));
-    })->name('admin.users');
+// ── Module Administration ──
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
 });
 
 require __DIR__.'/auth.php';

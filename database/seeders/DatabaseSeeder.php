@@ -14,65 +14,85 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. إنشاء Admin
+        // ── Admin (mariam) ──
         User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
+            'name'     => 'Administrateur',
+            'email'    => 'admin@cabinet.com',
+            'password' => Hash::make('admin123'),
+            'role'     => 'admin',
         ]);
 
-        // 2. إنشاء Secretaire
+        // ── Secrétaire (mariam) ──
         User::create([
-            'name' => 'Secretaire Fatima',
-            'email' => 'secretaire@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'secretaire',
+            'name'     => 'Secrétaire',
+            'email'    => 'secretaire@cabinet.com',
+            'password' => Hash::make('secret123'),
+            'role'     => 'secretaire',
         ]);
 
-        // 3. إنشاء Medecin
+        // ── Admin (fatima) ──
+        User::create([
+            'name'     => 'Admin User',
+            'email'    => 'admin@gmail.com',
+            'password' => Hash::make('password'),
+            'role'     => 'admin',
+        ]);
+
+        // ── Secrétaire (fatima) ──
+        User::create([
+            'name'     => 'Secretaire Fatima',
+            'email'    => 'secretaire@gmail.com',
+            'password' => Hash::make('password'),
+            'role'     => 'secretaire',
+        ]);
+
+        // ── Médecin (fatima) ──
         $userMed = User::create([
-            'name' => 'Dr. Ahmed Rayane',
-            'email' => 'medecin@gmail.com',
+            'name'     => 'Dr. Ahmed Rayane',
+            'email'    => 'medecin@gmail.com',
             'password' => Hash::make('password'),
-            'role' => 'medecin',
+            'role'     => 'medecin',
         ]);
         $medecin = Medecin::create([
-            'user_id' => $userMed->id,
-            'specialite' => 'Cardiologue',
-            'diplome' => 'Doctorat en Médecine',
+            'user_id'          => $userMed->id,
+            'specialite'       => 'Cardiologue',
+            'diplome'          => 'Doctorat en Médecine',
             'annee_experience' => 10,
         ]);
 
-        // 4. إنشاء Patient
+        // ── Patient (fatima) ──
         $userPat = User::create([
-            'name' => 'Salma Bennani',
-            'email' => 'patient@gmail.com',
+            'name'     => 'Salma Bennani',
+            'email'    => 'patient@gmail.com',
             'password' => Hash::make('password'),
-            'role' => 'patient',
+            'role'     => 'patient',
         ]);
         $patient = Patient::create([
-            'user_id' => $userPat->id,
+            'user_id'   => $userPat->id,
             'telephone' => '0600000000',
         ]);
 
-        // 5. إنشاء Rendez-vous (موعد قديم باش نديرو ليه استشارة)
+        // ── Rendez-vous (fatima) ──
         $rdv = RendezVous::create([
             'patient_id' => $patient->id,
             'medecin_id' => $medecin->id,
-            'date_heure' => now()->subDays(2), // موعد قبل يومين
-            'statut' => 'confirme',
-            'motif' => 'Consultation de routine',
+            'date_heure' => now()->subDays(2),
+            'statut'     => 'confirme',
+            'motif'      => 'Consultation de routine',
         ]);
 
-        // 6. إنشاء Consultation (التاريخ الطبي)
+        // ── Consultation (fatima) ──
         Consultation::create([
             'rendez_vous_id' => $rdv->id,
-            'patient_id' => $patient->id,
-            'medecin_id' => $medecin->id,
-            'diagnostic' => 'Hypertension légère détectée.',
-            'traitement' => 'Amlodipine 5mg, une fois par jour.',
-            'notes' => 'À revoir dans 3 mois.',
+            'diagnostic'     => 'Hypertension légère détectée.',
+            'traitement'     => 'Amlodipine 5mg, une fois par jour.',
+            'notes'          => 'À revoir dans 3 mois.',
+        ]);
+
+        // ── Médecins + Patients seeders (mariam) ──
+        $this->call([
+            MedecinSeeder::class,
+            PatientSeeder::class,
         ]);
     }
 }
