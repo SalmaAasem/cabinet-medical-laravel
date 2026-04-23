@@ -12,26 +12,30 @@ class ConsultationController extends Controller
     public function index()
     {
         $medecin = Auth::user()->medecin;
+
+        if (!$medecin) {
+            return redirect('/')->with('error', 'Accès refusé.');
+        }
+
         $rendezVous = RendezVous::where('medecin_id', $medecin->id)
-            ->with('patient.user', 'consultation')
-            ->orderBy('date_heure', 'asc')
+            ->with(['patient.user', 'consultation'])
+            ->orderBy('created_at', 'desc')
             ->get();
-        
-        return view('medecin.rendez-vous', compact('rendezVous'));
+
+        $totalRDV = $rendezVous->count();
+        $consultationsFaites = Consultation::where('medecin_id', $medecin->id)->count();
+
+        return view('medecin.rendez-vous', compact('rendezVous', 'totalRDV', 'consultationsFaites'));
     }
-    
+
     public function create($id)
     {
-        $rendezVous = RendezVous::with('patient.user')->findOrFail($id);
-        
-        // Vérifier que le médecin connecté est bien celui du rendez-vous
-        if ($rendezVous->medecin_id != Auth::user()->medecin->id) {
-            abort(403);
-        }
-        
+        $medecin = Auth::user()->medecin;
+        $rendezVous = RendezVous::with('patient.user')->where('medecin_id', $medecin->id)->findOrFail($id);
+
         return view('medecin.consultation', compact('rendezVous'));
     }
-    
+
     public function store(Request $request)
     {
         $request->validate([
@@ -40,19 +44,20 @@ class ConsultationController extends Controller
             'traitement' => 'required|string',
             'notes' => 'nullable|string',
         ]);
-        
+
+        $rdv = RendezVous::findOrFail($request->rendez_vous_id);
+
         Consultation::create([
-            'rendez_vous_id' => $request->rendez_vous_id,
+            'rendez_vous_id' => $rdv->id,
+            'patient_id' => $rdv->patient_id,
+            'medecin_id' => $rdv->medecin_id,
             'diagnostic' => $request->diagnostic,
             'traitement' => $request->traitement,
             'notes' => $request->notes,
         ]);
-        
-        // Mettre à jour le statut du rendez-vous
-        $rdv = RendezVous::find($request->rendez_vous_id);
-        $rdv->statut = 'termine';
-        $rdv->save();
-        
-        return redirect()->route('medecin.rendez-vous')->with('success', 'Consultation ajoutée avec succès !');
+
+        $rdv->update(['statut' => 'Terminé']);
+
+        return redirect()->route('medecin.rendez-vous')->with('success', 'Consultation enregistrée avec succès !');
     }
 }

@@ -1,85 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Ordonnance</title>
+    <meta charset="utf-8">
+    <title>Ordonnance - {{ $consultation->patient->user->name }}</title>
     <style>
-        body {
-            font-family: 'DejaVu Sans', sans-serif;
-            margin: 50px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 20px;
-        }
-        .header h1 {
-            margin: 0;
-            color: #2c3e50;
-        }
-        .medecin {
-            margin-bottom: 30px;
-        }
-        .patient {
-            margin-bottom: 30px;
-            padding: 10px;
-            background: #f5f5f5;
-        }
-        .ordonnance {
-            margin: 30px 0;
-            border: 1px dashed #333;
-            padding: 20px;
-            min-height: 200px;
-        }
-        .footer {
-            margin-top: 50px;
-            text-align: right;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-        }
-        .signature {
-            margin-top: 30px;
-        }
+        body { font-family: 'Helvetica', sans-serif; color: #333; line-height: 1.6; }
+        .header { text-align: center; border-bottom: 2px solid #667eea; padding-bottom: 20px; margin-bottom: 30px; }
+        .doctor-info { float: left; text-align: left; }
+        .date { float: right; }
+        .clearfix { clear: both; }
+        .patient-info { margin-bottom: 40px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
+        .content { margin-top: 50px; min-height: 300px; }
+        .meds { font-size: 1.1rem; line-height: 1.8; margin-bottom: 10px; white-space: pre-line; }
+        .footer { text-align: center; margin-top: 50px; font-size: 0.8rem; color: #777; border-top: 1px solid #eee; padding-top: 10px; position: absolute; bottom: 0; width: 100%; }
+        .stamp { margin-top: 40px; text-align: right; font-style: italic; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Cabinet Médical</h1>
-        <p>Centre de soins et consultations</p>
+        <h1 style="color: #764ba2; margin-bottom: 5px;">CABINET MÉDICAL</h1>
+        <p>Santé & Bien-être pour tous</p>
     </div>
-    
-    <div class="medecin">
-        <strong>Dr. {{ $consultation->rendezVous->medecin->user->name }}</strong><br>
-        Spécialité: {{ $consultation->rendezVous->medecin->specialite }}<br>
-        Diplôme: {{ $consultation->rendezVous->medecin->diplome }}
+
+    <div class="doctor-info">
+        <strong>Dr. {{ $consultation->medecin->user->name ?? 'Non spécifié' }}</strong><br>
+        Spécialiste en Médecine Générale<br>
+        Adresse: 123 Rue Hassan II, Casablanca<br>
+        Téléphone: +212 5 22 45 67 89
     </div>
-    
-    <div class="patient">
-        <strong>Patient :</strong> {{ $consultation->rendezVous->patient->user->name }}<br>
-        <strong>Date de consultation :</strong> {{ $consultation->created_at->format('d/m/Y') }}<br>
-        <strong>Rendez-vous du :</strong> {{ \Carbon\Carbon::parse($consultation->rendezVous->date_heure)->format('d/m/Y H:i') }}
+
+    <div class="date">
+        Fait le: <strong>{{ $consultation->created_at->format('d/m/Y') }}</strong>
     </div>
-    
-    <div class="ordonnance">
-        <h3>🩺 Diagnostic</h3>
-        <p>{{ $consultation->diagnostic }}</p>
-        
-        <h3>💊 Prescription / Traitement</h3>
-        <p>{{ $consultation->traitement }}</p>
-        
-        @if($consultation->notes)
-            <h3>📝 Notes supplémentaires</h3>
-            <p>{{ $consultation->notes }}</p>
-        @endif
+
+    <div class="clearfix"></div>
+
+    <div class="patient-info">
+        <p>Patient: <strong>{{ $consultation->patient->user->name }}</strong></p>
+        <p>Âge: {{ \Carbon\Carbon::parse($consultation->patient->date_naissance)->age }} ans</p>
     </div>
-    
-    <div class="footer">
-        <p>À renouveler si nécessaire. Durée du traitement: à déterminer par le médecin.</p>
-        <div class="signature">
-            Signature du médecin : _________________
+
+    <div class="content">
+        <h3 style="text-decoration: underline;">ORDONNANCE :</h3>
+        <div class="meds">
+            {!! nl2br(e($consultation->traitement)) !!}
         </div>
-      <small>Document généré par Cabinet Médical - {{ now()->format('d/m/Y H:i') }}</small>
+    </div>
+
+    <div class="stamp">
+        Signature et Cachet
+    </div>
+
+    <div class="footer">
+        Cabinet Médical - 123 Rue Hassan II, Casablanca - Tél: +212 5 22 45 67 89<br>
+        Email: contact@cabinet-medical.ma | Web: www.cabinetmedical.ma
     </div>
 </body>
 </html>

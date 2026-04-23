@@ -12,17 +12,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Vraies données de la base
-       $rdvAujourdhui = RendezVous::count(); // Tous les rendez-vous
+        $rdvAujourdhui = RendezVous::count();
         $totalPatients = Patient::count();
         $totalMedecins = Medecin::count();
         $consultationsMois = Consultation::whereMonth('created_at', now()->month)->count();
 
-        return view('dashboard', compact(
-            'rdvAujourdhui', 
-            'totalPatients', 
-            'totalMedecins', 
-            'consultationsMois'
-        ));
+        return view('dashboard', compact('rdvAujourdhui', 'totalPatients', 'totalMedecins', 'consultationsMois'));
     }
 }

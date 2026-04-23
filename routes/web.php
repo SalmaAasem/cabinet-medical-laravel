@@ -8,95 +8,79 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PatientController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\OrdonnanceController;
 use App\Http\Controllers\MedecinController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\GestionRdvController;
-use App\Models\User;
-use App\Models\Patient;
-use App\Models\RendezVous;
+use App\Http\Controllers\PlanningController;
 
 Route::get('/', function () {
-    return view('welcome');
+    $medecins = App\Models\Medecin::with('user')->get();
+    return view('welcome', compact('medecins'));
 });
 
-// ── Dashboard avec redirect selon rôle ──
-Route::get('/dashboard', function() {
+Route::get('/dashboard', function () {
     $user = Auth::user();
-    if ($user->role === 'admin') {
-        return redirect()->route('admin.dashboard');
-    } elseif ($user->role === 'medecin') {
-        return redirect()->route('medecin.rendez-vous');
-    } elseif ($user->role === 'secretaire') {
-        return redirect()->route('secretaire.dashboard');
+    switch ($user->role) {
+        case 'admin':
+            return redirect()->route('admin.dashboard');
+        case 'medecin':
+            return redirect()->route('medecin.rendez-vous');
+        case 'secretaire':
+            return redirect()->route('secretaire.dashboard');
+        case 'patient':
+            return redirect()->route('rendez-vous.index');
+        default:
+            return redirect('/');
     }
-    return redirect()->route('login');
-})->middleware(['auth'])->name('dashboard');
+})
+    ->middleware(['auth'])
+    ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
-
-    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Patients
-    Route::get('/patients/search', [PatientController::class, 'search'])->name('patients.search');
+    Route::get('/patients/search', [PatientController::class, 'index'])->name('patients.search');
     Route::get('/patients/{id}/historique', [PatientController::class, 'historique'])->name('patients.historique');
     Route::resource('patients', PatientController::class);
     Route::get('/mon-historique', [PatientController::class, 'myHistory'])->name('patient.my_history');
 
-    // Rendez-vous
     Route::get('/prendre-rendez-vous', [RendezVousController::class, 'create'])->name('rendez-vous.create');
     Route::post('/prendre-rendez-vous', [RendezVousController::class, 'store'])->name('rendez-vous.store');
     Route::get('/mes-rendez-vous', [RendezVousController::class, 'index'])->name('rendez-vous.index');
     Route::delete('/rendez-vous/{id}', [RendezVousController::class, 'destroy'])->name('rendez-vous.destroy');
 
-    Route::post('/rdv/store', function (Request $request) {
-        RendezVous::create([
-            'patient_id' => $request->patient_id,
-            'specialite' => $request->specialite,
-            'date_rdv'   => $request->date_rdv,
-            'statut'     => 'En attente'
-        ]);
-        return back()->with('success', 'Rendez-vous ajouté avec succès !');
-    })->name('rdv.store');
+    Route::prefix('medecin')
+        ->name('medecin.')
+        ->group(function () {
+            Route::get('/rendez-vous', [ConsultationController::class, 'index'])->name('rendez-vous');
 
-    // Médecin
-    Route::get('/medecin/rendez-vous', [ConsultationController::class, 'index'])->name('medecin.rendez-vous');
-    Route::get('/medecin/patients', [MedecinController::class, 'listPatients'])->name('medecin.patients.index');
-    Route::get('/medecin/patient/{id}/history', [MedecinController::class, 'showHistory'])->name('medecin.patient.history');
-    Route::get('/medecin/consultation/{id}', [ConsultationController::class, 'create'])->name('medecin.consultation.create');
-    Route::post('/medecin/consultation', [ConsultationController::class, 'store'])->name('medecin.consultation.store');
-    Route::get('/ordonnance/{id}/pdf', [OrdonnanceController::class, 'pdf'])->name('ordonnance.pdf');
+            Route::get('/patients', [MedecinController::class, 'listPatients'])->name('patients.index');
 
-    // Secrétaire
-    Route::get('/secretaire/dashboard', function () {
-        $total_patients = Patient::count();
-        $total_rdv = RendezVous::count();
-        $rdv_today = RendezVous::whereDate('created_at', today())->count();
-        $recent_rdvs = RendezVous::with('patient')->latest()->take(5)->get();
-        return view('secretaire.dashboard', compact('total_patients', 'total_rdv', 'rdv_today', 'recent_rdvs'));
-    })->name('secretaire.dashboard');
+            Route::get('/consultation/create/{rendezVous}', [ConsultationController::class, 'create'])->name('consultation.create');
+            Route::post('/consultation/store', [ConsultationController::class, 'store'])->name('consultation.store');
 
-    Route::get('/secretaire/patients', [PatientController::class, 'index'])->name('secretaire.patients.index');
+            Route::get('/consultation/pdf/{id}', [MedecinController::class, 'downloadPDF'])->name('consultation.pdf');
+            Route::get('/consultation/show/{id}', [MedecinController::class, 'showConsultation'])->name('consultation.show');
+            Route::get('/patient/{id}/history', [MedecinController::class, 'showHistory'])->name('patient.history');
+        });
 
-    // Gestion RDV
+    Route::get('/api/available-slots', [PlanningController::class, 'getAvailableSlots']);
+
+    Route::get('/secretaire/dashboard', [GestionRdvController::class, 'index'])->name('secretaire.dashboard');
     Route::get('/gestion-rdv', [GestionRdvController::class, 'index'])->name('gestion-rdv.index');
     Route::put('/gestion-rdv/{id}', [GestionRdvController::class, 'update'])->name('gestion-rdv.update');
     Route::delete('/gestion-rdv/{id}', [GestionRdvController::class, 'destroy'])->name('gestion-rdv.destroy');
 });
 
-// ── Module Administration ──
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/users', [UserController::class, 'index'])->name('users');
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-});
+Route::middleware(['auth'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/users', [UserController::class, 'index'])->name('users');
+        Route::resource('users', UserController::class)->except(['index']);
+    });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

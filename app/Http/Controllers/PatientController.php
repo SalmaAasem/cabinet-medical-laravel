@@ -10,109 +10,117 @@ use Illuminate\Support\Facades\Auth;
 
 class PatientController extends Controller
 {
-    // Display a listing of patients
-    public function index()
+    public function index(Request $request)
     {
-        $patients = Patient::with('user')->get();
-        return view('patients.index', compact('patients'));
+        $search = $request->input('search');
+
+        $query = Patient::with('user');
+
+        if ($search) {
+            $query
+                ->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")->orWhere('email', 'LIKE', "%{$search}%");
+                })
+                ->orWhere('telephone', 'LIKE', "%{$search}%");
+        }
+
+        $patients = $query->get();
+
+        return view('patients.index', compact('patients', 'search'));
     }
-    
-    // Show the form for creating a new patient
+
     public function create()
     {
         return view('patients.create');
     }
-    
-    // Store a newly created patient in storage
+
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
+            'password' => 'required|min:8|confirmed',
             'telephone' => 'required|string',
             'date_naissance' => 'required|date',
             'adresse' => 'required|string',
         ]);
-        
-        // Create the user account
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make('password123'),
             'role' => 'patient',
         ]);
-        
-        // Create the patient profile
+
         Patient::create([
             'user_id' => $user->id,
             'date_naissance' => $request->date_naissance,
             'telephone' => $request->telephone,
             'adresse' => $request->adresse,
         ]);
-        
+
         return redirect()->route('patients.index')->with('success', 'Patient ajouté avec succès !');
     }
 
-    // Show the form for editing the patient
     public function edit($id)
     {
         $patient = Patient::with('user')->findOrFail($id);
         return view('patients.edit', compact('patient'));
     }
 
-    // Update the patient in storage
     public function update(Request $request, $id)
     {
-        $patient = Patient::findOrFail($id);
+        $patient = Patient::with('user')->findOrFail($id);
 
         $request->validate([
+            'name' => 'required|string|max:255',
             'telephone' => 'required|string',
             'adresse' => 'required|string',
             'date_naissance' => 'required|date',
         ]);
 
-        $patient->update($request->only(['telephone', 'adresse', 'date_naissance']));
+        try {
+            $patient->user->update([
+                'name' => $request->name,
+            ]);
 
-        return redirect()->route('patients.index')->with('success', 'Le dossier médical a été mis à jour avec succès.');
+            $patient->update([
+                'telephone' => $request->telephone,
+                'adresse' => $request->adresse,
+                'date_naissance' => $request->date_naissance,
+            ]);
+
+            return redirect()->route('patients.index')->with('success', 'Patient mis à jour avec succès !');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de la modification : ' . $e->getMessage());
+        }
     }
 
-    // Display the medical history of a patient
     public function myHistory()
     {
-        // Load patient with consultations and doctors
-        $patient = Patient::with(['user', 'consultations.medecin.user'])
-        ->where('user_id', Auth::id())
-        ->firstOrFail();
-        $consultations = $patient->consultations; 
+        $patient = Patient::with(['user', 'consultations.rendezVous.medecin.user'])
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
+        $consultations = $patient->consultations()->orderBy('created_at', 'desc')->get();
+
+        return view('patients.historique', compact('patient', 'consultations'));
+    }
+
+    public function historique($id)
+    {
         $user = Auth::user();
 
-        return view('patients.historique', compact('patient', 'consultations', 'user'));
-    }
-    
-    // هاد الدالة خاصة بالسكريتيرة باش تشوف تاريخ أي مريض عن طريق الـ ID ديالو
-public function historique($id)
-{
-    // كنجيبو المريض بالـ ID ديالو مع الاستشارات
-    $patient = Patient::with(['user', 'consultations.medecin.user'])->findOrFail($id);
-    
-    // كنجيبو الاستشارات مرتبة من الأحدث
-    $consultations = $patient->consultations()->orderBy('created_at', 'desc')->get();
+        $patient = Patient::with(['user', 'consultations.rendezVous.medecin.user', 'rendezVous.medecin.user'])->findOrFail($id);
 
-    // كنصيفطوهم لنفس الـ View اللي صاوبنا
-    return view('patients.historique', compact('patient', 'consultations'));
-}
+        if ($user->role == 'secretaire') {
+            return view('secretaire.patient_history', compact('patient'));
+        }
 
-    // Search for patients
-    public function search(Request $request)
-    {
-        $search = $request->input('search');
+        if ($user->role == 'medecin' || $user->role == 'admin') {
+            return view('medecin.patient_history', compact('patient'));
+        }
 
-        $patients = Patient::whereHas('user', function($query) use ($search) {
-            $query->where('name', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%");
-        })->orWhere('telephone', 'like', "%$search%")->get();
-
-        return view('patients.index', compact('patients', 'search'));
+        return view('patients.historique', compact('patient'));
     }
 }

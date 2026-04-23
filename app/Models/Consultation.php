@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Consultation extends Model
 {
-    protected $fillable = ['rendez_vous_id', 'patient_id', 'medecin_id', 'diagnostic', 'traitement', 'notes'];
-    
+    protected $fillable = ['rendez_vous_id', 'patient_id', 'medecin_id', 'diagnostic', 'traitement', 'notes', 'ordonnance', 'date_consultation'];
+
     public function rendezVous()
     {
         return $this->belongsTo(RendezVous::class);
@@ -18,7 +18,6 @@ class Consultation extends Model
         return $this->belongsTo(Patient::class);
     }
 
-    
     public function medecin()
     {
         return $this->belongsTo(Medecin::class, 'medecin_id');

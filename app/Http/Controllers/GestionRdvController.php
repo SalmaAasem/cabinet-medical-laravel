@@ -1,35 +1,40 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\RendezVous;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
-use App\Mail\AppointmentConfirmation; 
+use App\Mail\AppointmentConfirmed;
 
 class GestionRdvController extends Controller
 {
     public function index()
     {
-
-        $rendezVous = RendezVous::with(['patient.user', 'medecin.user'])->orderBy('date_heure', 'desc')->get();
+        $rendezVous = RendezVous::with(['patient.user', 'medecin.user'])
+            ->orderBy('date_heure', 'desc')
+            ->get();
         return view('gestion-rdv.index', compact('rendezVous'));
     }
 
     public function update(Request $request, $id)
     {
         try {
-            $rdv = RendezVous::findOrFail($id);
+            $rdv = RendezVous::with('patient.user')->findOrFail($id);
             $rdv->statut = $request->statut;
             $rdv->save();
 
-            if ($rdv->statut === 'confirme') {
-                Mail::to($rdv->patient->user->email)->send(new \App\Mail\AppointmentConfirmed($rdv));
+            if ($rdv->statut === 'Confirmé' || $rdv->statut === 'confirme') {
+                try {
+                    Mail::to($rdv->patient->user->email)->send(new AppointmentConfirmed($rdv));
+                } catch (\Exception $e) {
+                    return back()->with('success', 'Statut changé ولكن الإيميل ما وصلش: ' . $e->getMessage());
+                }
             }
 
-            return response()->json(['message' => 'Statut mis à jour avec succès'], 200);
+            return back()->with('success', 'Statut mis à jour avec succès !');
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return back()->with('error', 'Erreur: ' . $e->getMessage());
         }
     }
 
@@ -37,6 +42,6 @@ class GestionRdvController extends Controller
     {
         $rdv = RendezVous::findOrFail($id);
         $rdv->delete();
-        return back()->with('success', 'Rendez-vous annulé et supprimé.');
+        return back()->with('success', 'Rendez-vous supprimé avec succès.');
     }
 }

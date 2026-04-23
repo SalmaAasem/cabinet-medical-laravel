@@ -18,16 +18,14 @@ class AppointmentConfirmation extends Mailable
     public function __construct($appointment)
     {
         $this->rdv = $appointment;
-    }  
+    }
 
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: 'Demande de Rendez-vous reçue',
-        );
+        return new Envelope(subject: 'Demande de Rendez-vous reçue');
     }
 
     /**
@@ -35,9 +33,7 @@ class AppointmentConfirmation extends Mailable
      */
     public function content(): Content
     {
-        return new Content(
-            view: 'emails.confirmation',
-        );
+        return new Content(view: 'emails.confirmation');
     }
 
     /**

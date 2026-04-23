@@ -29,9 +29,7 @@ class AppointmentConfirmed extends Mailable
      */
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: 'Votre Rendez-vous est Confirmé !',
-        );
+        return new Envelope(subject: 'Votre Rendez-vous est Confirmé !');
     }
 
     /**
@@ -39,9 +37,7 @@ class AppointmentConfirmed extends Mailable
      */
     public function content(): Content
     {
-        return new Content(
-            view: 'emails.confirmed_by_admin',
-        );
+        return new Content(view: 'emails.confirmed_by_admin');
     }
 
     /**

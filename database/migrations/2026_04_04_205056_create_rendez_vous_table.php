@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,6 +12,16 @@ return new class extends Migration
     {
         Schema::create('rendez_vous', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('patient_id')->constrained('patients')->onDelete('cascade');
+            $table->foreignId('medecin_id')->constrained('medecins')->onDelete('cascade');
+
+            $table->dateTime('date_heure')->nullable();
+
+            $table->date('date_rdv')->nullable();
+            $table->time('heure_rdv')->nullable();
+
+            $table->string('statut')->default('en_attente');
+            $table->text('motif')->nullable();
             $table->timestamps();
         });
     }

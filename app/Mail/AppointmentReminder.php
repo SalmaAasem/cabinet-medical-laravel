@@ -28,9 +28,7 @@ class AppointmentReminder extends Mailable
      */
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: 'Appointment Reminder',
-        );
+        return new Envelope(subject: 'Appointment Reminder');
     }
 
     /**
@@ -38,9 +36,7 @@ class AppointmentReminder extends Mailable
      */
     public function content(): Content
     {
-        return new Content(
-            view: 'emails.reminder',
-        );
+        return new Content(view: 'emails.reminder');
     }
 
     /**

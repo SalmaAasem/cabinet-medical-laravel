@@ -1,38 +1,39 @@
 <<<<<<< HEAD
-#  Cabinet Médical - Application de Gestion
+
+# Cabinet Médical - Application de Gestion
 
 Application web pour la gestion d'un cabinet médical (prise de rendez-vous, consultations, ordonnances PDF).
 
-##  Fonctionnalités
+## Fonctionnalités
 
--  Authentification (inscription, connexion, déconnexion)
--  Gestion des rôles (Patient, Médecin, Secrétaire, Admin)
--  Prise de rendez-vous en ligne
--  Consultation médicale (diagnostic, traitement)
--  Génération d'ordonnances en PDF
--  Gestion des utilisateurs (Admin)
--  Tableau de bord avec graphiques
--  Notifications par email
+- Authentification (inscription, connexion, déconnexion)
+- Gestion des rôles (Patient, Médecin, Secrétaire, Admin)
+- Prise de rendez-vous en ligne
+- Consultation médicale (diagnostic, traitement)
+- Génération d'ordonnances en PDF
+- Gestion des utilisateurs (Admin)
+- Tableau de bord avec graphiques
+- Notifications par email
 
-##  Technologies utilisées
+## Technologies utilisées
 
 | Technologie | Version |
-|-------------|---------|
-| Laravel | 11.x |
-| PHP | 8.2 |
-| MySQL | 8.0 |
-| Bootstrap | 5.3 |
-| DomPDF | 3.x |
-| Chart.js | 4.x |
+| ----------- | ------- |
+| Laravel     | 11.x    |
+| PHP         | 8.2     |
+| MySQL       | 8.0     |
+| Bootstrap   | 5.3     |
+| DomPDF      | 3.x     |
+| Chart.js    | 4.x     |
 
-##  Prérequis
+## Prérequis
 
 - PHP >= 8.2
 - Composer
 - MySQL
 - Node.js (pour les assets)
 
-##  Installation
+## Installation
 
 ### 1. Cloner le projet
 
@@ -42,3 +43,4 @@ cd cabinet-medical
 =======
 # cabinet-medical-laravel
 >>>>>>> 179726bd0b085baf88b9fd7ffc3d0981056cf7fd
+```

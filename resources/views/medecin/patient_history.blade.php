@@ -1,71 +1,116 @@
 @extends('layouts.simple')
 
 @section('content')
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold text-dark">
-            <i class="fas fa-history text-primary me-2"></i> Historique Médical
-        </h3>
-        <a href="{{ route('medecin.patients.index') }}" class="btn btn-outline-primary rounded-pill px-4">
-            <i class="fas fa-arrow-left me-1"></i> Retour à la liste
-        </a>
-    </div>
-
-    <div class="card shadow-sm border-0 rounded-4 mb-4">
-        <div class="card-body p-4">
-            <div class="d-flex align-items-center">
-                <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
-                    {{ strtoupper(substr($patient->user->name, 0, 1)) }}
+    <div class="container mt-4">
+        <div class="card shadow-lg border-0 rounded-4 mb-4"
+            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body p-4 text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="fw-bold mb-1">
+                            <i class="fas fa-file-medical-alt me-2"></i>
+                            {{-- هنا التغيير اللي غيصلح المشكل --}}
+                            Dossier Médical de : {{ $patient->user->name }}
+                        </h2>
+                        <p class="mb-0 opacity-75">Consultation des diagnostics et traitements du patient.</p>
+                    </div>
+                    <div class="ms-auto">
+                        {{-- زر الرجوع حسب الدور --}}
+                        @if (auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.users') }}" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm">
+                                <i class="fas fa-arrow-left me-2"></i> Retour
+                            </a>
+                        @else
+                            <a href="{{ url()->previous() }}" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm">
+                                <i class="fas fa-arrow-left me-2"></i> Retour
+                            </a>
+                        @endif
+                    </div>
                 </div>
-                <div>
-                    <h4 class="mb-0 fw-bold">{{ $patient->user->name }}</h4>
-                    <p class="text-muted mb-0">{{ $patient->user->email }}</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center">
+                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm"
+                        style="width: 65px; height: 65px; font-size: 1.5rem; font-weight: bold;">
+                        {{ strtoupper(substr($patient->user->name, 0, 1)) }}
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold text-dark">{{ $patient->user->name }}</h4>
+                        <p class="text-muted mb-0">{{ $patient->user->email }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr class="text-secondary border-bottom">
+                                <th class="pb-3 fw-bold">Date</th>
+                                <th class="pb-3 fw-bold">Médecin</th>
+                                <th class="pb-3 fw-bold">Diagnostic</th>
+                                <th class="pb-3 fw-bold">Traitement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($patient->consultations as $consultation)
+                                <tr class="border-bottom-0">
+                                    <td class="py-3 fw-semibold text-dark">
+                                        {{ $consultation->created_at->format('d/m/Y') }}
+                                    </td>
+                                    <td class="py-3 text-muted">
+                                        {{-- هنا كنجيبو سمية الطبيب اللي دار الاستشارة --}}
+                                        Dr. {{ $consultation->rendezVous->medecin->user->name ?? 'N/A' }}
+                                    </td>
+                                    <td class="py-3 text-dark">
+                                        {{ $consultation->diagnostic }}
+                                    </td>
+                                    <td class="py-3">
+                                        <span
+                                            class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2">
+                                            {{ $consultation->traitement }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center py-5">
+                                        <div class="opacity-50">
+                                            <i class="fas fa-folder-open fa-3x mb-3 text-muted"></i>
+                                            <p class="text-muted fw-bold">Aucun historique trouvé.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="timeline">
-        @forelse($patient->consultations as $consultation)
-            <div class="card shadow-sm border-0 rounded-4 mb-3 border-start border-primary border-4">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge bg-light text-primary rounded-pill px-3 py-2">
-                            <i class="fas fa-calendar-alt me-1"></i> {{ $consultation->created_at->format('d M Y') }}
-                        </span>
-                        <small class="text-muted">ID: #{{ $consultation->id }}</small>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <h6 class="fw-bold text-dark"><i class="fas fa-stethoscope me-2 text-info"></i> Diagnostic</h6>
-                            <p class="text-muted bg-light p-3 rounded-3">{{ $consultation->diagnostic }}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <h6 class="fw-bold text-dark"><i class="fas fa-pills me-2 text-success"></i> Traitement</h6>
-                            <p class="text-muted bg-light p-3 rounded-3">{{ $consultation->traitement }}</p>
-                        </div>
-                    </div>
+    <style>
+        .table thead th {
+            border-top: none;
+            background-color: #f8f9fa;
+            padding: 15px;
+        }
 
-                    @if($consultation->notes)
-                    <div class="mt-2">
-                        <h6 class="fw-bold text-dark"><i class="fas fa-sticky-note me-2 text-warning"></i> Notes additionnelles</h6>
-                        <p class="small text-muted">{{ $consultation->notes }}</p>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        @empty
-            <div class="text-center py-5">
-                <i class="fas fa-folder-open fa-3x text-muted mb-3 opacity-25"></i>
-                <p class="text-muted">Aucune consultation trouvée pour ce patient.</p>
-            </div>
-        @endforelse
-    </div>
-</div>
+        .table tbody td {
+            padding: 15px;
+        }
 
-<style>
-    .card { transition: transform 0.2s; }
-    .card:hover { transform: scale(1.01); }
-</style>
+        .bg-primary-subtle {
+            background-color: #e7f1ff !important;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+        }
+    </style>
 @endsection

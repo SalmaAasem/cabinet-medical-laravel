@@ -8,6 +8,13 @@
                 <div class="card-body p-4">
                     <h2 class="fw-bold mb-0"><i class="fas fa-users me-2"></i> Gestion des Patients</h2>
                     <p class="opacity-75">Consultez l'historique médical et gérez vos patients.</p>
+</div>
+
+                    {{-- هاد السطر هو اللي زدت باش يبان زر الرجوع --}}
+                    <a href="{{ route('medecin.rendez-vous') }}" class="btn btn-light rounded-pill px-4 shadow fw-bold position-absolute" 
+               style="top: 50%; right: 25px; transform: translateY(-50%); color: #764ba2;">
+                        <i class="fas fa-arrow-left me-1"></i> Retour
+                    </a>
                 </div>
             </div>
         </div>
