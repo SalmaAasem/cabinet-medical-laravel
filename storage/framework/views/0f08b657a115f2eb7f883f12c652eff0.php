@@ -35,7 +35,6 @@
                             </li>
                         <?php endif; ?>
 
-                        
                         <?php if(Auth::user()->role == 'medecin'): ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="<?php echo e(route('medecin.rendez-vous')); ?>">Mes consultations</a>
@@ -43,9 +42,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="<?php echo e(route('medecin.patients.index')); ?>">Liste patients</a>
                             </li>
+                            <a href="<?php echo e(route('medecin.planning.index')); ?>" class="nav-link">Mon Planning</a>
                         <?php endif; ?>
 
-                        
                         <?php if(Auth::user()->role == 'secretaire' || Auth::user()->role == 'admin'): ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="<?php echo e(route('patients.create')); ?>">Ajouter patient</a>

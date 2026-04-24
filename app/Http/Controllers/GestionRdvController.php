@@ -28,7 +28,7 @@ class GestionRdvController extends Controller
                 try {
                     Mail::to($rdv->patient->user->email)->send(new AppointmentConfirmed($rdv));
                 } catch (\Exception $e) {
-                    return back()->with('success', 'Statut changé ولكن الإيميل ما وصلش: ' . $e->getMessage());
+                    return back()->with('success', 'Statut changé mais l\'envoi de l\'email a échoué ' . $e->getMessage());
                 }
             }
 

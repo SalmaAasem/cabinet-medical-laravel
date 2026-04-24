@@ -9,9 +9,42 @@ use Carbon\Carbon;
 
 class PlanningController extends Controller
 {
-    /**
-     * كيجيب السوايع اللي متاحين عند واحد الطبيب في نهار محدد
-     */
+
+
+    public function index()
+    {
+    $medecinId = auth()->user()->medecin->id; 
+    $plannings = Planning::where('medecin_id', $medecinId)->get();
+
+    return view('medecin.planning', compact('plannings'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'jour' => 'required',
+            'heure_debut' => 'required',
+            'heure_fin' => 'required|after:heure_debut',
+            'duree_consultation' => 'required|integer|min:10',
+        ]);
+
+        $medecinId = auth()->user()->medecin->id; 
+
+        Planning::updateOrCreate(
+            [
+                'medecin_id' => $medecinId,
+                'jour' => $request->jour
+            ],
+            [
+                'heure_debut' => $request->heure_debut,
+                'heure_fin' => $request->heure_fin,
+                'duree_consultation' => $request->duree_consultation,
+            ]
+        );
+
+        return back()->with('success', 'Planning mis à jour avec succès !');
+    }
+
     public function getAvailableSlots(Request $request)
     {
         $request->validate([

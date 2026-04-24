@@ -61,17 +61,22 @@ class RendezVousController extends Controller
             return back()->withErrors(['error' => 'Erreur: Aucun patient sélectionné.']);
         }
 
-        \App\Models\RendezVous::create([
-            'patient_id' => $patientId,
-            'medecin_id' => $request->medecin_id,
-            'date_rdv' => $request->date_rdv,
-            'heure_rdv' => $request->heure_rdv,
-            'date_heure' => $request->date_rdv . ' ' . $request->heure_rdv,
-            'motif' => $request->motif,
-            'statut' => 'en_attente',
-        ]);
 
-        return redirect()->route('rendez-vous.index')->with('success', 'Rendez-vous ajouté !');
+$rdv = \App\Models\RendezVous::create([
+    'patient_id' => $patientId,
+    'medecin_id' => $request->medecin_id,
+    'date_rdv' => $request->date_rdv,
+    'heure_rdv' => $request->heure_rdv,
+    'date_heure' => $request->date_rdv . ' ' . $request->heure_rdv,
+    'motif' => $request->motif,
+    'statut' => 'en_attente',
+]);
+
+$user = auth()->user()->role == 'patient' ? auth()->user() : $rdv->patient->user;
+
+\Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\AppointmentConfirmation($rdv));  
+
+    return redirect()->route('rendez-vous.index')->with('success', 'Rendez-vous ajouté !');
     }
 
     public function index()
@@ -87,9 +92,6 @@ class RendezVousController extends Controller
         return view('rendezvous.index', compact('rendezVous'));
     }
 
-    /**
-     * حذف أو إلغاء الموعد
-     */
     public function destroy($id)
     {
         $rdv = RendezVous::findOrFail($id);

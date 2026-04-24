@@ -60,7 +60,8 @@ Route::middleware(['auth'])->group(function () {
 
             Route::get('/consultation/create/{rendezVous}', [ConsultationController::class, 'create'])->name('consultation.create');
             Route::post('/consultation/store', [ConsultationController::class, 'store'])->name('consultation.store');
-
+            Route::get('/medecin/planning', [PlanningController::class, 'index'])->name('planning.index');
+            Route::post('/medecin/planning', [PlanningController::class, 'store'])->name('planning.store'); 
             Route::get('/consultation/pdf/{id}', [MedecinController::class, 'downloadPDF'])->name('consultation.pdf');
             Route::get('/consultation/show/{id}', [MedecinController::class, 'showConsultation'])->name('consultation.show');
             Route::get('/patient/{id}/history', [MedecinController::class, 'showHistory'])->name('patient.history');

@@ -27,7 +27,7 @@ class SendAppointmentReminders extends Command
     {
         $tomorrow = now()->addDay()->toDateString();
 
-        $appointments = \App\Models\RendezVous::where('statut', 'confirme')->whereDate('date_heure', $tomorrow)->get();
+        $appointments = \App\Models\RendezVous::where('statut', 'confirme')->whereDate('date_rdv', $tomorrow)->get();
 
         if ($appointments->isEmpty()) {
             $this->warn('Aucun rendez-vous trouvé pour le : ' . $tomorrow);

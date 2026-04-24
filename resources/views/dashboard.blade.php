@@ -89,23 +89,32 @@
                     <div class="card-body p-4">
                         <div class="row g-3">
 
+     
+                            
                             {{-- Medecin Actions --}}
-                            @if (Auth::user()->role == 'medecin')
-                                <div class="col-md-6">
-                                    <a href="{{ route('medecin.rendez-vous') }}"
-                                        class="btn btn-primary w-100 py-3 rounded-3 shadow-sm"
-                                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
-                                        <i class="fas fa-calendar-check me-2"></i> Mes consultations
-                                    </a>
-                                </div>
-                                <div class="col-md-6">
-                                    <a href="{{ route('medecin.patients.index') }}"
-                                        class="btn btn-outline-primary w-100 py-3 rounded-3 shadow-sm">
-                                        <i class="fas fa-file-medical me-2"></i> Liste des Patients
-                                    </a>
-                                </div>
-                            @endif
-
+@if (Auth::user()->role == 'medecin')
+    <div class="col-md-4">
+        <a href="{{ route('medecin.rendez-vous') }}"
+            class="btn btn-primary w-100 py-3 rounded-3 shadow-sm"
+            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+            <i class="fas fa-calendar-check me-2"></i> Mes consultations
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ route('medecin.patients.index') }}"
+            class="btn btn-outline-primary w-100 py-3 rounded-3 shadow-sm">
+            <i class="fas fa-file-medical me-2"></i> Liste des Patients
+        </a>
+    </div>
+    
+    <div class="col-md-4">
+        <a href="{{ route('medecin.planning.index') }}"
+            class="btn btn-primary w-100 py-3 rounded-3 shadow-sm"
+            style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border: none;">
+            <i class="fas fa-clock me-2"></i> Mon Planning
+        </a>
+    </div>
+@endif
                             {{-- Patient Actions (Modified to Blue/Purple) --}}
                             @if (Auth::user()->role == 'patient')
                                 <div class="col-md-6">

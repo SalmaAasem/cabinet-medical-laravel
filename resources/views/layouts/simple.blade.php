@@ -22,7 +22,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     @auth
-                        {{-- 1. واجهة المريض: حيدنا "Liste patients" --}}
+                        
                         @if (Auth::user()->role == 'patient')
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('rendez-vous.create') }}">Prendre RDV</a>
@@ -35,7 +35,6 @@
                             </li>
                         @endif
 
-                        {{-- 2. واجهة الطبيب: هنا فين زدت "Liste patients" --}}
                         @if (Auth::user()->role == 'medecin')
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('medecin.rendez-vous') }}">Mes consultations</a>
@@ -43,9 +42,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('medecin.patients.index') }}">Liste patients</a>
                             </li>
+                            <a href="{{ route('medecin.planning.index') }}" class="nav-link">Mon Planning</a>
                         @endif
 
-                        {{-- 3. واجهة السكريتيرة والأدمن --}}
                         @if (Auth::user()->role == 'secretaire' || Auth::user()->role == 'admin')
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('patients.create') }}">Ajouter patient</a>
